@@ -11,10 +11,36 @@
 #define HEIGHT 480
 
 float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+    -0.5f, -0.5f, 0.5f,
+     0.5f, -0.5f, 0.5f,
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+
+    -0.5f, 0.5f, 0.5f,
+     0.5f, 0.5f, 0.5f,
+    -0.5f, 0.5f, -0.5f,
+     0.5f, 0.5f, -0.5f,
 }; 
+
+int indices[] = {
+    0, 3, 2,
+    0, 1, 3,
+
+    1, 8, 3,
+    1, 6, 8,
+
+    6, 7, 8,
+    6, 5, 7,
+
+    5, 0, 2,
+    5, 2, 7,
+
+    5, 6, 1,
+    5, 1, 0,
+
+    7, 8, 3,
+    7, 3, 2,
+};
 
 static const char* vertex_shader_text =
 "#version 330 core\n"
@@ -31,7 +57,7 @@ static const char* fragment_shader_text =
 "    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
 "}\n";
 
-glm::vec3 cameraPos = glm::vec3(2.0f, 2.0f, 2.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::mat4 proj;
 
 void error_callback(int error, const char* description) {
@@ -54,30 +80,19 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     } else if (key == GLFW_KEY_A) {
-        if (action == GLFW_PRESS) {
-            std::cout << "A pressed\n";
-            params.state &= params.A_DOWN;
-        }
+        if (action == GLFW_PRESS) { params.state |= params.A_DOWN; }
         else if (action == GLFW_RELEASE) params.state &= ~params.A_DOWN;
     } else if (key == GLFW_KEY_D) {
-        if (action == GLFW_PRESS) {
-            std::cout << "D pressed\n";
-            params.state &= params.D_DOWN;
-        }
+        if (action == GLFW_PRESS) { params.state |= params.D_DOWN; }
         else if (action == GLFW_RELEASE) params.state &= ~params.D_DOWN;
     } else if (key == GLFW_KEY_S) {
-        if (action == GLFW_PRESS) {
-            std::cout << "S pressed\n";
-            params.state &= params.S_DOWN;
-        }
+        if (action == GLFW_PRESS) { params.state |= params.S_DOWN; }
         else if (action == GLFW_RELEASE) params.state &= ~params.S_DOWN;
     } else if (key == GLFW_KEY_W) {
-        if (action == GLFW_PRESS) {
-            std::cout << "W pressed\n";
-            params.state &= params.W_DOWN;
-        }
+        if (action == GLFW_PRESS) { params.state |= params.W_DOWN; }
         else if (action == GLFW_RELEASE) params.state &= ~params.W_DOWN;
     }
+    std::cout << params.state << std::endl;
 }
 
 int main(void) {
@@ -126,6 +141,11 @@ int main(void) {
 
     proj = glm::perspective(45.0f, 800.0f / 600.0f, 1.0f, 10.0f);
 
+    glm::mat4 view = glm::lookAt(
+        cameraPos,
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f));
+
     float lastTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -134,18 +154,19 @@ int main(void) {
         float deltaTime = currentTime - lastTime;
         lastTime = currentTime;
 
-        float moveAmount = 1.0f;
-        deltaTime = 1.0f;
+        float moveAmount = 3.0f;
+
+        glm::vec3 movement(0.0f);
 
         if (params.state & params.W_DOWN) {
-            cameraPos.y += moveAmount * deltaTime;
+            movement.x += moveAmount * deltaTime;
         } else if (params.state & params.S_DOWN) {
-            cameraPos.y -= moveAmount * deltaTime;
+            movement.x -= moveAmount * deltaTime;
         }
         if (params.state & params.A_DOWN) {
-            cameraPos.x -= moveAmount * deltaTime;
+            movement.y -= moveAmount * deltaTime;
         } else if (params.state & params.D_DOWN) {
-            cameraPos.y += moveAmount * deltaTime;
+            movement.y += moveAmount * deltaTime;
         }
 
         glViewport(0, 0, width, height);
@@ -153,11 +174,8 @@ int main(void) {
 
         //Set up MVP
         glm::mat4 model(1.0f);
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        glm::mat4 view = glm::lookAt(
-            cameraPos,
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(0.0f, 0.0f, 1.0f));
+        //model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        view = glm::translate(view, movement);
         glm::mat4 mvp = proj * view * model;
 
         glUseProgram(program);
