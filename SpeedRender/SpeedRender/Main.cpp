@@ -7,10 +7,12 @@
 
 #include <iostream>
 
+#include <stb_image.h>
+
 #include "Shader.h"
 
-#define WIDTH 960
-#define HEIGHT 540
+#define WIDTH 800
+#define HEIGHT 600
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);  
 void processInput(GLFWwindow* window);
@@ -38,6 +40,10 @@ int main() {
 
     glViewport(0, 0, WIDTH, HEIGHT);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);  
+
+    // textures
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("assets/images/container.jpg", &width, &height, &nrChannels, 0);
 
     // set up shaders
     Shader shader("assets/shaders/MainVertex.vs", "assets/shaders/MainFragment.fs");
