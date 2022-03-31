@@ -12,18 +12,22 @@
 #include <sstream>
 #include <iostream>
 
+#include "Core.h"
 #include "Shader.h"
   
 class Light {
 public:
-    Light(const glm::vec3 &position, const glm::vec3 &scale);
+    Light(const glm::vec3 &position, const glm::vec3 &scale, const Color &color);
     void Draw(const glm::mat4 &view, const glm::mat4 &projection) const;
     void SetPosition(const glm::vec3& position);
+    glm::vec3 GetPosition() { return position; }
+    Color GetColor() { return color; }
 private:
     unsigned int VAO, VBO;
     Shader shader;
     glm::vec3 position;
     glm::vec3 scale;
+    Color color;
 };
   
 #endif

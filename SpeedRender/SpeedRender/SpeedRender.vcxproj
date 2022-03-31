@@ -158,6 +158,7 @@
     <ClCompile Include="include\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Core.h" />
     <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="vendor\stb_image.h" />
@@ -167,6 +168,7 @@
     <None Include="assets\shaders\Light.vs" />
     <None Include="assets\shaders\MainFragment.fs" />
     <None Include="assets\shaders\MainVertex.vs" />
+    <None Include="assets\shaders\Phong.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\container.jpg" />

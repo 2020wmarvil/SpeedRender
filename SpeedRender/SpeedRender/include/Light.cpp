@@ -44,9 +44,10 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f
 };
 
-Light::Light(const glm::vec3& position, const glm::vec3 &scale) {
+Light::Light(const glm::vec3& position, const glm::vec3 &scale, const Color &color) {
 	this->position = position;
     this->scale = scale;
+    this->color = color;
 
 	// create shader
     shader = *(new Shader("assets/shaders/Light.vs", "assets/shaders/Light.fs"));
@@ -70,6 +71,7 @@ void Light::Draw(const glm::mat4 &view, const glm::mat4 &projection) const {
     shader.SetMat4("model", model);
     shader.SetMat4("view", view);
     shader.SetMat4("projection", projection);
+    shader.SetVec3("color", color);
 
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
