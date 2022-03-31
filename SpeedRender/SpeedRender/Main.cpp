@@ -199,10 +199,21 @@ int main() {
     }
     stbi_image_free(data);
 
-    Light light(glm::vec3(1.2f, 1.0f, 2.0f), glm::vec3(0.1f, 0.1f, 0.1f), Color(0.2f, 0.35f, 0.8f));
+    Light light(glm::vec3(1.2f, 1.0f, 2.0f), glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
+        { 
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            glm::vec3(0.5f, 0.5f, 0.5f),
+            glm::vec3(1.0f, 1.0f, 1.0f)
+        });
 
     // set up shaders
     Shader shader("assets/shaders/MainVertex.vs", "assets/shaders/Phong.fs");
+    Material material = {
+        glm::vec3(1.0f, 0.5f, 0.31f),
+        glm::vec3(1.0f, 0.5f, 0.31f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        32.0f
+    };
 
     // render loop
     while(!glfwWindowShouldClose(window)) {
@@ -232,9 +243,17 @@ int main() {
         shader.SetMat4("model", model);
         shader.SetMat4("view", view);
         shader.SetMat4("projection", projection);
-        shader.SetVec3("lightPos", light.GetPosition());
-        shader.SetVec3("lightColor", light.GetColor());
         shader.SetVec3("cameraPos", cameraPos);
+
+        shader.SetVec3("material.ambient", material.ambient);
+        shader.SetVec3("material.diffuse", material.diffuse);
+        shader.SetVec3("material.specular", material.specular);
+        shader.SetFloat("material.shininess", material.shininess);
+
+        shader.SetVec3("light.position", light.GetPosition());
+        shader.SetVec3("light.ambient", light.GetLightProfile().ambient);
+        shader.SetVec3("light.diffuse", light.GetLightProfile().diffuse);
+        shader.SetVec3("light.specular", light.GetLightProfile().specular);
 
         glActiveTexture(GL_TEXTURE0);
 	    glBindTexture(GL_TEXTURE_2D, texture);
@@ -249,13 +268,12 @@ int main() {
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             shader.SetMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
-            break;
         }
 
         light.Draw(view, projection);
 
         glfwSwapBuffers(window);
-        glfwPollEvents();    
+        glfwPollEvents();
 
         glCheckError();
     }

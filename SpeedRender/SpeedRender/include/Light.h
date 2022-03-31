@@ -17,17 +17,19 @@
   
 class Light {
 public:
-    Light(const glm::vec3 &position, const glm::vec3 &scale, const Color &color);
+    Light(const glm::vec3 &position, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile);
     void Draw(const glm::mat4 &view, const glm::mat4 &projection) const;
     void SetPosition(const glm::vec3& position);
     glm::vec3 GetPosition() { return position; }
     Color GetColor() { return color; }
+    LightProfile GetLightProfile() { return lightProfile; }
 private:
     unsigned int VAO, VBO;
     Shader shader;
     glm::vec3 position;
     glm::vec3 scale;
     Color color;
+    LightProfile lightProfile;
 };
   
 #endif

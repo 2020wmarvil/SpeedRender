@@ -44,10 +44,11 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f
 };
 
-Light::Light(const glm::vec3& position, const glm::vec3 &scale, const Color &color) {
+Light::Light(const glm::vec3& position, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile) {
 	this->position = position;
     this->scale = scale;
     this->color = color;
+    this->lightProfile = lightProfile;
 
 	// create shader
     shader = *(new Shader("assets/shaders/Light.vs", "assets/shaders/Light.fs"));
