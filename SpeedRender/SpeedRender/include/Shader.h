@@ -18,9 +18,10 @@ public:
     unsigned int ID;
   
     // constructor reads and builds the shader
+    Shader();
     Shader(const char* vertexPath, const char* fragmentPath);
     // use/activate the shader
-    void Use();
+    void Use() const;
     // utility uniform functions
     void SetBool(const std::string &name, bool value) const;  
     void SetInt(const std::string &name, int value) const;   

@@ -151,16 +151,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\Light.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="include\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="vendor\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\shaders\Light.fs" />
+    <None Include="assets\shaders\Light.vs" />
     <None Include="assets\shaders\MainFragment.fs" />
     <None Include="assets\shaders\MainVertex.vs" />
   </ItemGroup>

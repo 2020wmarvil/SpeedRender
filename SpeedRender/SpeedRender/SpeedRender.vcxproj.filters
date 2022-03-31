@@ -27,6 +27,9 @@
     <ClCompile Include="stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Shader.h">
@@ -35,10 +38,15 @@
     <ClInclude Include="vendor\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\MainVertex.vs" />
     <None Include="assets\shaders\MainFragment.fs" />
+    <None Include="assets\shaders\Light.vs" />
+    <None Include="assets\shaders\Light.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\container.jpg">

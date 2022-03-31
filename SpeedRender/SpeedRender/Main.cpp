@@ -10,6 +10,7 @@
 #include <stb_image.h>
 
 #include "Shader.h"
+#include "Light.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -87,6 +88,15 @@ int main() {
 
     // set up shaders
     Shader shader("assets/shaders/MainVertex.vs", "assets/shaders/MainFragment.fs");
+
+    //unsigned int lightVAO;
+    //glGenVertexArrays(1, &lightVAO);
+    //glBindVertexArray(lightVAO);
+    //// we only need to bind to the VBO, the container's VBO's data already contains the data.
+    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //// set the vertex attribute 
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    //glEnableVertexAttribArray(0);
 
     // mesh data
     float vertices[] = {
@@ -210,6 +220,8 @@ int main() {
     }
     stbi_image_free(data);
 
+    Light light(glm::vec3(1.2f, 1.0f, 2.0f), glm::vec3(0.1f, 0.1f, 0.1f));
+
     // render loop
     while(!glfwWindowShouldClose(window)) {
         deltaTime = glfwGetTime() - lastTime;
@@ -255,6 +267,8 @@ int main() {
             shader.SetMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+
+        light.Draw(view, projection);
 
         glfwSwapBuffers(window);
         glfwPollEvents();    
