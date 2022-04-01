@@ -7,13 +7,9 @@
 
 #include <iostream>
 
-#include <stb_image.h>
-
 #include "Shader.h"
 #include "Light.h"
-
-#define WIDTH 800
-#define HEIGHT 600
+#include "Texture.h"
 
 GLenum glCheckError_(const char *file, int line)
 {
@@ -36,6 +32,9 @@ GLenum glCheckError_(const char *file, int line)
     return errorCode;
 }
 #define glCheckError() glCheckError_(__FILE__, __LINE__) 
+
+#define WIDTH 800
+#define HEIGHT 600
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);  
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -164,46 +163,6 @@ int main() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);  
 
-    // texture stuff
-    stbi_set_flip_vertically_on_load(true);
-
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    // set the texture wrapping/filtering options (on the currently bound texture object)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load and generate the texture
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load("assets/images/container2.png", &width, &height, &nrChannels, 0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
-    unsigned int texture2;
-    glGenTextures(1, &texture2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    // set the texture wrapping/filtering options (on the currently bound texture object)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load and generate the texture
-    data = stbi_load("assets/images/container2_specular.png", &width, &height, &nrChannels, 0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
     Light light(glm::vec3(1.2f, 1.0f, 2.0f), glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
@@ -211,9 +170,14 @@ int main() {
             glm::vec3(1.0f, 1.0f, 1.0f)
         });
 
+    // textures
+    Texture::SetFlipImageOnLoad(true);
+    Texture diffuseMap("assets/images/container2.png");
+    Texture specularMap("assets/images/container2_specular.png");
+
     // set up shaders
     Shader shader("assets/shaders/MainVertex.vs", "assets/shaders/Phong.fs");
-    Material material = { texture, texture2, 32.0f };
+    Material material = { diffuseMap, specularMap, 32.0f };
 
     // render loop
     while(!glfwWindowShouldClose(window)) {
@@ -248,9 +212,9 @@ int main() {
         shader.SetVec3("light.specular", light.GetLightProfile().specular);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, material.diffuseMapID);
+        glBindTexture(GL_TEXTURE_2D, material.diffuseMap.id);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, material.specularMapID);
+        glBindTexture(GL_TEXTURE_2D, material.specularMap.id);
 
         glBindVertexArray(VAO);
         for(unsigned int i = 0; i < 10; i++) {

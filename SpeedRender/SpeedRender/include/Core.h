@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 
+#include "Texture.h"
+
 struct Transform {
 	glm::vec3 position;
 	glm::vec3 rotation;
@@ -18,8 +20,8 @@ struct LightProfile {
 };
 
 struct Material {
-    int diffuseMapID;
-    int specularMapID;
+    Texture diffuseMap;
+    Texture specularMap;
     float shininess;
 };
 
