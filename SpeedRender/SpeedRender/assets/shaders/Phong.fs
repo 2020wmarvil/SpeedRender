@@ -4,11 +4,11 @@ out vec4 FragColor;
 
 in vec3 normal;
 in vec3 worldPos;
+in vec2 texCoords;
 
 struct Material {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    sampler2D diffuse;
+    sampler2D specular;
     float shininess;
 }; 
   
@@ -28,19 +28,19 @@ uniform vec3 cameraPos;
 
 void main() {
     // ambient color
-    vec3 ambientColor = material.ambient * light.ambient;
+    vec3 ambientColor = light.ambient * vec3(texture(material.diffuse, texCoords));
 
     // diffuse color
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(light.position - worldPos);
     float diffuseStrength = max(dot(norm, lightDir), 0.0);
-    vec3 diffuseColor = material.diffuse * diffuseStrength * light.diffuse;
+    vec3 diffuseColor = light.diffuse * diffuseStrength * vec3(texture(material.diffuse, texCoords));  
 
     // specular color
     vec3 viewDir = normalize(cameraPos - worldPos);
     vec3 reflectDir = reflect(-lightDir, norm);  
     float specularStrength = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 specularColor = material.specular * specularStrength * light.specular;
+    vec3 specularColor = light.specular * specularStrength * vec3(texture(material.specular, texCoords));
 
     // compositing
     vec3 finalColor = ambientColor + diffuseColor + specularColor;

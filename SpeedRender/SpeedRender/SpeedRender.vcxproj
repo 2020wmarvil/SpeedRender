@@ -171,7 +171,10 @@
     <None Include="assets\shaders\Phong.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\images\awesomeface.png" />
     <Image Include="assets\images\container.jpg" />
+    <Image Include="assets\images\container2.png" />
+    <Image Include="assets\images\container2_specular.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
