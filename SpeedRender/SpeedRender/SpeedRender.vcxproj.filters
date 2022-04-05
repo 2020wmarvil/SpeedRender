@@ -27,7 +27,7 @@
     <ClCompile Include="stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\Light.cpp">
+    <ClCompile Include="include\Lighting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="include\Texture.cpp">
@@ -41,7 +41,7 @@
     <ClInclude Include="vendor\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Light.h">
+    <ClInclude Include="include\Lighting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Core.h">

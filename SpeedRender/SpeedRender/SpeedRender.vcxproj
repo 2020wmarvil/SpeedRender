@@ -151,7 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\Light.cpp" />
+    <ClCompile Include="include\Lighting.cpp" />
     <ClCompile Include="include\Texture.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="glad.c" />
@@ -160,7 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core.h" />
-    <ClInclude Include="include\Light.h" />
+    <ClInclude Include="include\Lighting.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="vendor\stb_image.h" />

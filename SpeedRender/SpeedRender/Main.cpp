@@ -7,8 +7,9 @@
 
 #include <iostream>
 
+#include "Core.h"
+#include "Lighting.h"
 #include "Shader.h"
-#include "Light.h"
 #include "Texture.h"
 
 GLenum glCheckError_(const char *file, int line)
@@ -163,13 +164,6 @@ int main() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);  
 
-    Light light(glm::vec3(1.2f, 1.0f, 2.0f), glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
-        { 
-            glm::vec3(0.2f, 0.2f, 0.2f),
-            glm::vec3(0.5f, 0.5f, 0.5f),
-            glm::vec3(1.0f, 1.0f, 1.0f)
-        });
-
     // textures
     Texture::SetFlipImageOnLoad(true);
     Texture diffuseMap("assets/images/container2.png");
@@ -178,6 +172,46 @@ int main() {
     // set up shaders
     Shader shader("assets/shaders/MainVertex.vs", "assets/shaders/Phong.fs");
     Material material = { diffuseMap, specularMap, 32.0f };
+
+    // lights
+    DirectionalLight dirLight(glm::vec3(-0.2f, -1.0f, -0.3f), Color(1.0f, 0.0f, 0.0f),
+        { 
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            glm::vec3(0.5f, 0.5f, 0.5f),
+            glm::vec3(1.0f, 1.0f, 1.0f)
+        });
+
+    glm::vec3 pointLightPositions[] = {
+    	glm::vec3( 0.7f,  0.2f,  2.0f),
+    	glm::vec3( 2.3f, -3.3f, -4.0f),
+    	glm::vec3(-4.0f,  2.0f, -12.0f),
+    	glm::vec3( 0.0f,  0.0f, -3.0f)
+    };
+
+    PointLight light(pointLightPositions[0], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
+        { 
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            glm::vec3(0.5f, 0.5f, 0.5f),
+            glm::vec3(1.0f, 1.0f, 1.0f)
+        });
+    PointLight light2(pointLightPositions[1], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
+        { 
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            glm::vec3(0.5f, 0.5f, 0.5f),
+            glm::vec3(1.0f, 1.0f, 1.0f)
+        });
+    PointLight light3(pointLightPositions[2], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
+        { 
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            glm::vec3(0.5f, 0.5f, 0.5f),
+            glm::vec3(1.0f, 1.0f, 1.0f)
+        });
+    PointLight light4(pointLightPositions[3], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
+        { 
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            glm::vec3(0.5f, 0.5f, 0.5f),
+            glm::vec3(1.0f, 1.0f, 1.0f)
+        });
 
     // render loop
     while(!glfwWindowShouldClose(window)) {
@@ -206,10 +240,28 @@ int main() {
         shader.SetInt("material.diffuse", 0);
         shader.SetInt("material.specular", 1);
         shader.SetFloat("material.shininess", material.shininess);
-        shader.SetVec3("light.position", light.GetPosition());
-        shader.SetVec3("light.ambient", light.GetLightProfile().ambient);
-        shader.SetVec3("light.diffuse", light.GetLightProfile().diffuse);
-        shader.SetVec3("light.specular", light.GetLightProfile().specular);
+
+        shader.SetVec3("pointLights[0].position", light.position);
+        shader.SetVec3("pointLights[0].ambient",  light.lightProfile.ambient);
+        shader.SetVec3("pointLights[0].diffuse",  light.lightProfile.diffuse);
+        shader.SetVec3("pointLights[0].specular", light.lightProfile.specular);
+        shader.SetVec3("pointLights[1].position", light2.position);
+        shader.SetVec3("pointLights[1].ambient",  light2.lightProfile.ambient);
+        shader.SetVec3("pointLights[1].diffuse",  light2.lightProfile.diffuse);
+        shader.SetVec3("pointLights[1].specular", light2.lightProfile.specular);
+        shader.SetVec3("pointLights[2].position", light3.position);
+        shader.SetVec3("pointLights[2].ambient",  light3.lightProfile.ambient);
+        shader.SetVec3("pointLights[2].diffuse",  light3.lightProfile.diffuse);
+        shader.SetVec3("pointLights[2].specular", light3.lightProfile.specular);
+        shader.SetVec3("pointLights[3].position", light4.position);
+        shader.SetVec3("pointLights[3].ambient",  light4.lightProfile.ambient);
+        shader.SetVec3("pointLights[3].diffuse",  light4.lightProfile.diffuse);
+        shader.SetVec3("pointLights[3].specular", light4.lightProfile.specular);
+
+        shader.SetVec3("dirLight.direction", dirLight.direction);
+        shader.SetVec3("dirLight.ambient", dirLight.lightProfile.ambient);
+        shader.SetVec3("dirLight.diffuse", dirLight.lightProfile.diffuse);
+        shader.SetVec3("dirLight.specular", dirLight.lightProfile.specular);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, material.diffuseMap.id);
@@ -227,6 +279,9 @@ int main() {
         }
 
         light.Draw(view, projection);
+        //light2.Draw(view, projection);
+        //light3.Draw(view, projection);
+        //light4.Draw(view, projection);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
