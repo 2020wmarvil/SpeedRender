@@ -188,30 +188,32 @@ int main() {
     	glm::vec3( 0.0f,  0.0f, -3.0f)
     };
 
+    AttenuationProfile ap = { 1.0f, 0.09, 0.032f };
+
     PointLight light(pointLightPositions[0], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
             glm::vec3(0.5f, 0.5f, 0.5f),
             glm::vec3(1.0f, 1.0f, 1.0f)
-        });
+        }, ap);
     PointLight light2(pointLightPositions[1], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
             glm::vec3(0.5f, 0.5f, 0.5f),
             glm::vec3(1.0f, 1.0f, 1.0f)
-        });
+        }, ap);
     PointLight light3(pointLightPositions[2], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
             glm::vec3(0.5f, 0.5f, 0.5f),
             glm::vec3(1.0f, 1.0f, 1.0f)
-        });
+        }, ap);
     PointLight light4(pointLightPositions[3], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
             glm::vec3(0.5f, 0.5f, 0.5f),
             glm::vec3(1.0f, 1.0f, 1.0f)
-        });
+        }, ap);
 
     // render loop
     while(!glfwWindowShouldClose(window)) {
@@ -245,18 +247,33 @@ int main() {
         shader.SetVec3("pointLights[0].ambient",  light.lightProfile.ambient);
         shader.SetVec3("pointLights[0].diffuse",  light.lightProfile.diffuse);
         shader.SetVec3("pointLights[0].specular", light.lightProfile.specular);
+        shader.SetFloat("pointLights[0].constant",  light.attenuationProfile.constant);
+        shader.SetFloat("pointLights[0].linear",    light.attenuationProfile.linear);
+        shader.SetFloat("pointLights[0].quadratic", light.attenuationProfile.quadratic);
+
         shader.SetVec3("pointLights[1].position", light2.position);
         shader.SetVec3("pointLights[1].ambient",  light2.lightProfile.ambient);
         shader.SetVec3("pointLights[1].diffuse",  light2.lightProfile.diffuse);
         shader.SetVec3("pointLights[1].specular", light2.lightProfile.specular);
+        shader.SetFloat("pointLights[1].constant",  light2.attenuationProfile.constant);
+        shader.SetFloat("pointLights[1].linear",    light2.attenuationProfile.linear);
+        shader.SetFloat("pointLights[1].quadratic", light2.attenuationProfile.quadratic);
+
         shader.SetVec3("pointLights[2].position", light3.position);
         shader.SetVec3("pointLights[2].ambient",  light3.lightProfile.ambient);
         shader.SetVec3("pointLights[2].diffuse",  light3.lightProfile.diffuse);
         shader.SetVec3("pointLights[2].specular", light3.lightProfile.specular);
+        shader.SetFloat("pointLights[2].constant",  light3.attenuationProfile.constant);
+        shader.SetFloat("pointLights[2].linear",    light3.attenuationProfile.linear);
+        shader.SetFloat("pointLights[2].quadratic", light3.attenuationProfile.quadratic);
+
         shader.SetVec3("pointLights[3].position", light4.position);
         shader.SetVec3("pointLights[3].ambient",  light4.lightProfile.ambient);
         shader.SetVec3("pointLights[3].diffuse",  light4.lightProfile.diffuse);
         shader.SetVec3("pointLights[3].specular", light4.lightProfile.specular);
+        shader.SetFloat("pointLights[3].constant",  light4.attenuationProfile.constant);
+        shader.SetFloat("pointLights[3].linear",    light4.attenuationProfile.linear);
+        shader.SetFloat("pointLights[3].quadratic", light4.attenuationProfile.quadratic);
 
         shader.SetVec3("dirLight.direction", dirLight.direction);
         shader.SetVec3("dirLight.ambient", dirLight.lightProfile.ambient);
@@ -279,9 +296,9 @@ int main() {
         }
 
         light.Draw(view, projection);
-        //light2.Draw(view, projection);
-        //light3.Draw(view, projection);
-        //light4.Draw(view, projection);
+        light2.Draw(view, projection);
+        light3.Draw(view, projection);
+        light4.Draw(view, projection);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

@@ -65,10 +65,10 @@ void main() {
     vec3 norm = normalize(normal);
     vec3 viewDir = normalize(cameraPos - worldPos);
     
-    color += CalcDirLight(dirLight, norm, viewDir);
+    //color += CalcDirLight(dirLight, norm, viewDir);
 
     for(int i = 0; i < NR_POINT_LIGHTS; i++) {
-    //	color += CalcPointLight(pointLights[i], norm, worldPos, viewDir);
+    	color += CalcPointLight(pointLights[i], norm, worldPos, viewDir);
     }
 
     //for(int i = 0; i < NR_SPOT_LIGHTS; i++) {

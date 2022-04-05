@@ -50,11 +50,12 @@ DirectionalLight::DirectionalLight(const glm::vec3& direction, const Color &colo
     this->lightProfile = lightProfile;
 }
 
-PointLight::PointLight(const glm::vec3& position, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile) {
+PointLight::PointLight(const glm::vec3& position, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile, const AttenuationProfile &attenuationProfile) {
 	this->position = position;
     this->scale = scale;
     this->color = color;
     this->lightProfile = lightProfile;
+    this->attenuationProfile = attenuationProfile;
 
 	// create shader
     shader = *(new Shader("assets/shaders/Light.vs", "assets/shaders/Light.fs"));
@@ -84,11 +85,14 @@ void PointLight::Draw(const glm::mat4 &view, const glm::mat4 &projection) const 
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
-SpotLight::SpotLight(const glm::vec3& position, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile) {
+SpotLight::SpotLight(const glm::vec3 &position, const glm::vec3 &direction, float cutoff, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile, const AttenuationProfile &attenuationProfile) {
 	this->position = position;
+	this->direction = direction;
+	this->cutoff = cutoff;
     this->scale = scale;
     this->color = color;
     this->lightProfile = lightProfile;
+    this->attenuationProfile = attenuationProfile;
 
 	// create shader
     shader = *(new Shader("assets/shaders/Light.vs", "assets/shaders/Light.fs"));

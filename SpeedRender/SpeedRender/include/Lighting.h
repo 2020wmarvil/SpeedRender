@@ -21,6 +21,12 @@ struct LightProfile {
     glm::vec3 specular;
 };
 
+struct AttenuationProfile {
+    float constant;
+    float linear;
+    float quadratic;  
+};
+
 class DirectionalLight {
 public:
     DirectionalLight(const glm::vec3 &direction, const Color &color, const LightProfile &lightProfile);
@@ -32,13 +38,14 @@ public:
   
 class PointLight {
 public:
-    PointLight(const glm::vec3 &position, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile);
+    PointLight(const glm::vec3 &position, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile, const AttenuationProfile &attenuationProfile);
     void Draw(const glm::mat4 &view, const glm::mat4 &projection) const;
 
     glm::vec3 position;
     glm::vec3 scale;
     Color color;
 	LightProfile lightProfile;
+    AttenuationProfile attenuationProfile;
 private:
     unsigned int VAO, VBO;
     Shader shader;
@@ -46,13 +53,16 @@ private:
 
 class SpotLight {
 public:
-    SpotLight(const glm::vec3 &position, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile);
+    SpotLight(const glm::vec3 &position, const glm::vec3 &direction, float cutoff, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile, const AttenuationProfile &attenuationProfile);
     void Draw(const glm::mat4 &view, const glm::mat4 &projection) const;
 
     glm::vec3 position;
+    glm::vec3 direction;
+    float cutoff;
     glm::vec3 scale;
     Color color;
 	LightProfile lightProfile;
+	AttenuationProfile attenuationProfile;
 private:
     unsigned int VAO, VBO;
     Shader shader;
