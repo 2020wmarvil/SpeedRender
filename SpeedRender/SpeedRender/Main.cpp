@@ -190,32 +190,32 @@ int main() {
 
     AttenuationProfile ap = { 1.0f, 0.09, 0.032f };
 
-    PointLight light(pointLightPositions[0], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
+    PointLight light(pointLightPositions[0], glm::vec3(0.1f, 0.1f, 0.1f), Color(0.0f, 1.0f, 1.0f), 
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
             glm::vec3(0.5f, 0.5f, 0.5f),
             glm::vec3(1.0f, 1.0f, 1.0f)
         }, ap);
-    PointLight light2(pointLightPositions[1], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
+    PointLight light2(pointLightPositions[1], glm::vec3(0.1f, 0.1f, 0.1f), Color(0.0f, 0.0f, 1.0f), 
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
             glm::vec3(0.5f, 0.5f, 0.5f),
             glm::vec3(1.0f, 1.0f, 1.0f)
         }, ap);
-    PointLight light3(pointLightPositions[2], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
+    PointLight light3(pointLightPositions[2], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 0.0f), 
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
             glm::vec3(0.5f, 0.5f, 0.5f),
             glm::vec3(1.0f, 1.0f, 1.0f)
         }, ap);
-    PointLight light4(pointLightPositions[3], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
+    PointLight light4(pointLightPositions[3], glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 0.0f, 1.0f), 
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
             glm::vec3(0.5f, 0.5f, 0.5f),
             glm::vec3(1.0f, 1.0f, 1.0f)
         }, ap);
 
-    SpotLight spot1(cameraPos, cameraFront, 10.0f, 7.5f, 12.5f, glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
+    SpotLight spot1(cameraPos, cameraFront, 10.0f, 7.5f, 12.5f, glm::vec3(0.1f, 0.1f, 0.1f), Color(0.0f, 1.0f, 1.0f), 
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
             glm::vec3(0.5f, 0.5f, 0.5f),
@@ -258,6 +258,7 @@ int main() {
         shader.SetFloat("material.shininess", material.shininess);
 
         shader.SetVec3("pointLights[0].position", light.position);
+        shader.SetVec3("pointLights[0].color", light.color);
         shader.SetVec3("pointLights[0].ambient",  light.lightProfile.ambient);
         shader.SetVec3("pointLights[0].diffuse",  light.lightProfile.diffuse);
         shader.SetVec3("pointLights[0].specular", light.lightProfile.specular);
@@ -266,6 +267,7 @@ int main() {
         shader.SetFloat("pointLights[0].quadratic", light.attenuationProfile.quadratic);
 
         shader.SetVec3("pointLights[1].position", light2.position);
+        shader.SetVec3("pointLights[1].color", light2.color);
         shader.SetVec3("pointLights[1].ambient",  light2.lightProfile.ambient);
         shader.SetVec3("pointLights[1].diffuse",  light2.lightProfile.diffuse);
         shader.SetVec3("pointLights[1].specular", light2.lightProfile.specular);
@@ -274,6 +276,7 @@ int main() {
         shader.SetFloat("pointLights[1].quadratic", light2.attenuationProfile.quadratic);
 
         shader.SetVec3("pointLights[2].position", light3.position);
+        shader.SetVec3("pointLights[3].color", light3.color);
         shader.SetVec3("pointLights[2].ambient",  light3.lightProfile.ambient);
         shader.SetVec3("pointLights[2].diffuse",  light3.lightProfile.diffuse);
         shader.SetVec3("pointLights[2].specular", light3.lightProfile.specular);
@@ -282,6 +285,7 @@ int main() {
         shader.SetFloat("pointLights[2].quadratic", light3.attenuationProfile.quadratic);
 
         shader.SetVec3("pointLights[3].position", light4.position);
+        shader.SetVec3("pointLights[3].color", light4.color);
         shader.SetVec3("pointLights[3].ambient",  light4.lightProfile.ambient);
         shader.SetVec3("pointLights[3].diffuse",  light4.lightProfile.diffuse);
         shader.SetVec3("pointLights[3].specular", light4.lightProfile.specular);
@@ -290,6 +294,7 @@ int main() {
         shader.SetFloat("pointLights[3].quadratic", light4.attenuationProfile.quadratic);
 
         shader.SetVec3("dirLight.direction", dirLight.direction);
+        shader.SetVec3("dirLight.color", dirLight.color);
         shader.SetVec3("dirLight.ambient", dirLight.lightProfile.ambient);
         shader.SetVec3("dirLight.diffuse", dirLight.lightProfile.diffuse);
         shader.SetVec3("dirLight.specular", dirLight.lightProfile.specular);
@@ -298,6 +303,7 @@ int main() {
         spot1.direction = cameraFront;
 
         shader.SetVec3("spotLights[0].position", spot1.position);
+        shader.SetVec3("spotLights[0].color", spot1.color);
         shader.SetVec3("spotLights[0].direction", spot1.direction);
         shader.SetFloat("spotLights[0].cutoff", spot1.cutoff);
         shader.SetFloat("spotLights[0].innerCutoff", spot1.innerCutoff);
