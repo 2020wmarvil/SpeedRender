@@ -53,12 +53,14 @@ private:
 
 class SpotLight {
 public:
-    SpotLight(const glm::vec3 &position, const glm::vec3 &direction, float cutoff, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile, const AttenuationProfile &attenuationProfile);
+    SpotLight(const glm::vec3 &position, const glm::vec3 &direction, float cutoff, float innerCutoff, float outerCutoff, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile, const AttenuationProfile &attenuationProfile);
     void Draw(const glm::mat4 &view, const glm::mat4 &projection) const;
 
     glm::vec3 position;
     glm::vec3 direction;
     float cutoff;
+    float innerCutoff;
+    float outerCutoff;
     glm::vec3 scale;
     Color color;
 	LightProfile lightProfile;

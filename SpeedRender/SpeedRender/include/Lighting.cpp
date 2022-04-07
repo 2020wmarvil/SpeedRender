@@ -85,10 +85,12 @@ void PointLight::Draw(const glm::mat4 &view, const glm::mat4 &projection) const 
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
-SpotLight::SpotLight(const glm::vec3 &position, const glm::vec3 &direction, float cutoff, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile, const AttenuationProfile &attenuationProfile) {
+SpotLight::SpotLight(const glm::vec3 &position, const glm::vec3 &direction, float cutoff, float innerCutoff, float outerCutoff, const glm::vec3 &scale, const Color &color, const LightProfile &lightProfile, const AttenuationProfile &attenuationProfile) {
 	this->position = position;
 	this->direction = direction;
 	this->cutoff = cutoff;
+	this->innerCutoff = innerCutoff;
+	this->outerCutoff = outerCutoff;
     this->scale = scale;
     this->color = color;
     this->lightProfile = lightProfile;

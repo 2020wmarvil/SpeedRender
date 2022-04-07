@@ -1,4 +1,4 @@
-﻿#define GLFW_INCLUDE_NONE
+#define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -215,14 +215,14 @@ int main() {
             glm::vec3(1.0f, 1.0f, 1.0f)
         }, ap);
 
-    SpotLight spot1(cameraPos, cameraFront, 10.0f, 7.5f, 12.5f, glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
+    SpotLight spot1(cameraPos, cameraFront, 5.0f, glm::vec3(0.1f, 0.1f, 0.1f), Color(1.0f, 1.0f, 1.0f), 
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
-            glm::vec3(0.5f, 0.5f, 0.5f),
-            glm::vec3(1.0f, 1.0f, 1.0f)
+            glm::vec3(1.0f, 1.0f, 1.0f),
+            glm::vec3(0.1f, 0.1f, 0.1f)
         }, 
 
-        { 1.0f, 0.09f, 0.032f }
+        { 1.0f, 0.014f, 0.0007f }
         
         );
 
@@ -299,9 +299,7 @@ int main() {
 
         shader.SetVec3("spotLights[0].position", spot1.position);
         shader.SetVec3("spotLights[0].direction", spot1.direction);
-        shader.SetFloat("spotLights[0].cutoff", spot1.cutoff);
-        shader.SetFloat("spotLights[0].innerCutoff", spot1.innerCutoff);
-        shader.SetFloat("spotLights[0].outerCutoff", spot1.outerCutoff);
+        shader.SetFloat("spotLights[0].cutOff", spot1.cutoff);
         shader.SetVec3("spotLights[0].ambient", spot1.lightProfile.ambient);
         shader.SetVec3("spotLights[0].diffuse", spot1.lightProfile.diffuse);
         shader.SetVec3("spotLights[0].specular", spot1.lightProfile.specular);
