@@ -16,6 +16,7 @@ public:
 	}
 
     unsigned int id;
+	std::string type;
 	int width, height, numChannels;
 };
 #endif

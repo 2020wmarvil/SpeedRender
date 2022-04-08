@@ -65,8 +65,6 @@ vec3 CalcDirLight(DirectionalLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
-// TODO: use light color
-
 void main() {
     vec3 color = vec3(0.0);
     
