@@ -173,12 +173,14 @@
     <ClInclude Include="vendor\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\shaders\Color.fs" />
+    <None Include="assets\shaders\TestNormals.fs" />
+    <None Include="assets\shaders\TestUVs.fs" />
     <None Include="assets\shaders\Light.fs" />
     <None Include="assets\shaders\Light.vs" />
     <None Include="assets\shaders\MainFragment.fs" />
     <None Include="assets\shaders\MainVertex.vs" />
     <None Include="assets\shaders\Phong.fs" />
+    <None Include="assets\shaders\Unlit.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\awesomeface.png" />

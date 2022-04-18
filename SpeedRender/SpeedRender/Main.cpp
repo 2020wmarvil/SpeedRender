@@ -157,7 +157,7 @@ int main() {
     Texture specularMap("assets/images/container2_specular.png");
 
     // set up shaders
-    Shader shader("assets/shaders/MainVertex.vs", "assets/shaders/Color.fs");
+    Shader shader("assets/shaders/MainVertex.vs", "assets/shaders/Unlit.fs");
     Material material = { diffuseMap, specularMap, 32.0f };
 
     // lights
@@ -199,15 +199,6 @@ int main() {
         shader.SetMat4("projection", projection);
         shader.SetVec3("cameraPos", cameraPos);
 
-        shader.SetVec3("pointLights[0].position", light.position);
-        shader.SetVec3("pointLights[0].color", light.color);
-        shader.SetVec3("pointLights[0].ambient",  light.lightProfile.ambient);
-        shader.SetVec3("pointLights[0].diffuse",  light.lightProfile.diffuse);
-        shader.SetVec3("pointLights[0].specular", light.lightProfile.specular);
-        shader.SetFloat("pointLights[0].constant",  light.attenuationProfile.constant);
-        shader.SetFloat("pointLights[0].linear",    light.attenuationProfile.linear);
-        shader.SetFloat("pointLights[0].quadratic", light.attenuationProfile.quadratic);
-
         shader.SetVec3("dirLight.direction", dirLight.direction);
         shader.SetVec3("dirLight.color", dirLight.color);
         shader.SetVec3("dirLight.ambient", dirLight.lightProfile.ambient);
@@ -217,6 +208,8 @@ int main() {
         shader.SetInt("material.diffuse", 0);
         shader.SetInt("material.specular", 1);
         shader.SetFloat("material.shininess", material.shininess);
+
+        shader.SetVec3("mainColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, material.diffuseMap.id);
