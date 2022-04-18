@@ -161,12 +161,14 @@
     <ClCompile Include="include\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Core.h" />
     <ClInclude Include="include\Lighting.h" />
     <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\Model.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\Texture.h" />
+    <ClInclude Include="include\Window.h" />
     <ClInclude Include="vendor\cy\cyCore.h" />
     <ClInclude Include="vendor\cy\cyTriMesh.h" />
     <ClInclude Include="vendor\cy\cyVector.h" />
