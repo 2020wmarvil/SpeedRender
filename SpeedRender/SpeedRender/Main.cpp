@@ -90,39 +90,38 @@ int main() {
 
     // mesh data
     cy::TriMesh t;
-    t.LoadFromFileObj("assets/models/cube.obj");
+    t.LoadFromFileObj("assets/models/sphere.obj");
 
     // loop over vertices
     std::vector<float> vertIn;
-    for (int i = 0; i < t.NV(); i++) {
-        // positions
-        cy::Vec3f v = t.V(i);
-        vertIn.push_back(v.x);
-        vertIn.push_back(v.y);
-        vertIn.push_back(v.z);
-
-        // normals
-        if (t.HasNormals()) {
-            cy::Vec3f n = t.VN(i);
-            vertIn.push_back(n.x);
-            vertIn.push_back(n.y);
-            vertIn.push_back(n.z);
-        }
-
-        // uvs
-        if (t.HasTextureVertices()) {
-            cy::Vec3f uv = t.VT(i);
-            vertIn.push_back(uv.x);
-            vertIn.push_back(uv.y);
-        }
-    }
-
-    std::vector<int> indIn;
     for (int i = 0; i < t.NF(); i++) {
+        // face position
         cy::TriMesh::TriFace f = t.F(i);
-        indIn.push_back(f.v[0]);
-        indIn.push_back(f.v[1]);
-        indIn.push_back(f.v[2]);
+        cy::TriMesh::TriFace fn;
+        if (t.HasNormals()) fn = t.FN(i);
+        cy::TriMesh::TriFace ft;
+        if (t.HasTextureVertices()) ft = t.FT(i);
+
+        for (int j = 0; j < 3; j++) {
+            cy::Vec3f pos = t.V(f.v[j]);
+            vertIn.push_back(pos.x);
+            vertIn.push_back(pos.y);
+            vertIn.push_back(pos.z);
+
+            // face normal
+            if (t.HasNormals()) {
+                cy::Vec3f norm = t.VN(fn.v[j]);
+                vertIn.push_back(norm.x);
+                vertIn.push_back(norm.y);
+                vertIn.push_back(norm.z);
+            }
+            // face uv
+            if (t.HasTextureVertices()) {
+                cy::Vec3f uv = t.VT(ft.v[j]);
+                vertIn.push_back(uv.x);
+                vertIn.push_back(uv.y);
+            }
+        }
     }
 
     // set up buffers
@@ -145,19 +144,13 @@ int main() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);  
 
-    // element buffer
-    unsigned int EBO;
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indIn.size() * sizeof(int), (void*)&indIn.at(0), GL_STATIC_DRAW);
-
     // textures
     Texture::SetFlipImageOnLoad(true);
     Texture diffuseMap("assets/images/container2.png");
     Texture specularMap("assets/images/container2_specular.png");
 
     // set up shaders
-    Shader shader("assets/shaders/MainVertex.vs", "assets/shaders/Unlit.fs");
+    Shader shader("assets/shaders/MainVertex.vs", "assets/shaders/TestNormals.fs");
     Material material = { diffuseMap, specularMap, 32.0f };
 
     // lights
@@ -167,14 +160,6 @@ int main() {
             glm::vec3(0.5f, 0.5f, 0.5f),
             glm::vec3(1.0f, 1.0f, 1.0f)
         });
-
-    PointLight light(glm::vec3( 0.7f,  0.2f,  2.0f), glm::vec3(0.1f, 0.1f, 0.1f), Color(0.0f, 1.0f, 1.0f), 
-        { 
-            glm::vec3(0.2f, 0.2f, 0.2f),
-            glm::vec3(0.5f, 0.5f, 0.5f),
-            glm::vec3(1.0f, 1.0f, 1.0f)
-        }, { 1.0f, 0.09, 0.032f });
-
 
     // render loop
     while(!glfwWindowShouldClose(window)) {
@@ -187,7 +172,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        //model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         glm::mat4 view = glm::mat4(1.0f);
         view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         glm::mat4 projection;
@@ -217,10 +202,7 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, material.specularMap.id);
 
         glBindVertexArray(VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glDrawElements(GL_TRIANGLES, indIn.size(), GL_UNSIGNED_INT, 0);
-
-        light.Draw(view, projection);
+        glDrawArrays(GL_TRIANGLES, 0, vertIn.size());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
