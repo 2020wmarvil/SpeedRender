@@ -1,7 +1,7 @@
 #include "Model.h"
 
 Model::Model(char* path) {
-    LoadModel(path);
+    //LoadModel(path);
 }
 
 void Model::Draw(Shader &shader) {
