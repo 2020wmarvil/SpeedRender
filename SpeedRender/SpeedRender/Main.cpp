@@ -11,8 +11,7 @@
 #include "Lighting.h"
 #include "Shader.h"
 #include "Texture.h"
-
-#include "cy/cyTriMesh.h"
+#include "Model.h"
 
 GLenum glCheckError_(const char *file, int line)
 {
@@ -59,6 +58,8 @@ bool firstMouse = true;
 
 float fov = 45.0f;
 
+bool testNormals = false, oneIsPressed = false;
+
 int main() {
     // initialization
 	glfwInit();
@@ -89,60 +90,7 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     // mesh data
-    cy::TriMesh t;
-    t.LoadFromFileObj("assets/models/sphere.obj");
-
-    // loop over vertices
-    std::vector<float> vertIn;
-    for (int i = 0; i < t.NF(); i++) {
-        // face position
-        cy::TriMesh::TriFace f = t.F(i);
-        cy::TriMesh::TriFace fn;
-        if (t.HasNormals()) fn = t.FN(i);
-        cy::TriMesh::TriFace ft;
-        if (t.HasTextureVertices()) ft = t.FT(i);
-
-        for (int j = 0; j < 3; j++) {
-            cy::Vec3f pos = t.V(f.v[j]);
-            vertIn.push_back(pos.x);
-            vertIn.push_back(pos.y);
-            vertIn.push_back(pos.z);
-
-            // face normal
-            if (t.HasNormals()) {
-                cy::Vec3f norm = t.VN(fn.v[j]);
-                vertIn.push_back(norm.x);
-                vertIn.push_back(norm.y);
-                vertIn.push_back(norm.z);
-            }
-            // face uv
-            if (t.HasTextureVertices()) {
-                cy::Vec3f uv = t.VT(ft.v[j]);
-                vertIn.push_back(uv.x);
-                vertIn.push_back(uv.y);
-            }
-        }
-    }
-
-    // set up buffers
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);  
-    glBindVertexArray(VAO);
-
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertIn.size() * sizeof(float), (void*)&vertIn.at(0), GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // normal attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);  
-    // tex coords
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);  
+    Model cube("assets/models/cube.obj");
 
     // textures
     Texture::SetFlipImageOnLoad(true);
@@ -150,7 +98,8 @@ int main() {
     Texture specularMap("assets/images/container2_specular.png");
 
     // set up shaders
-    Shader shader("assets/shaders/MainVertex.vs", "assets/shaders/TestNormals.fs");
+    Shader normalsShader("assets/shaders/MainVertex.vs", "assets/shaders/TestNormals.fs");
+    Shader uvsShader("assets/shaders/MainVertex.vs", "assets/shaders/TestUVs.fs");
     Material material = { diffuseMap, specularMap, 32.0f };
 
     // lights
@@ -178,31 +127,44 @@ int main() {
         glm::mat4 projection;
         projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
 
-        shader.Use();
+        /* Lit Shader 
         shader.SetMat4("model", model);
         shader.SetMat4("view", view);
         shader.SetMat4("projection", projection);
         shader.SetVec3("cameraPos", cameraPos);
-
         shader.SetVec3("dirLight.direction", dirLight.direction);
         shader.SetVec3("dirLight.color", dirLight.color);
         shader.SetVec3("dirLight.ambient", dirLight.lightProfile.ambient);
         shader.SetVec3("dirLight.diffuse", dirLight.lightProfile.diffuse);
         shader.SetVec3("dirLight.specular", dirLight.lightProfile.specular);
-        
         shader.SetInt("material.diffuse", 0);
         shader.SetInt("material.specular", 1);
-        shader.SetFloat("material.shininess", material.shininess);
+        shader.SetFloat("material.shininess", material.shininess); */
 
-        shader.SetVec3("mainColor", glm::vec3(1.0f, 1.0f, 1.0f));
+        /* Unlit Shader
+        shader.SetMat4("model", model);
+        shader.SetMat4("view", view);
+        shader.SetMat4("projection", projection);
+        shader.SetVec3("mainColor", glm::vec3(1.0f, 1.0f, 1.0f)); */
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, material.diffuseMap.id);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, material.specularMap.id);
 
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, vertIn.size());
+        if (testNormals) {
+            normalsShader.Use();
+            normalsShader.SetMat4("model", model);
+            normalsShader.SetMat4("view", view);
+            normalsShader.SetMat4("projection", projection);
+            cube.Draw(normalsShader);
+        } else {
+            uvsShader.Use();
+            uvsShader.SetMat4("model", model);
+            uvsShader.SetMat4("view", view);
+            uvsShader.SetMat4("projection", projection);
+            cube.Draw(uvsShader);
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -223,6 +185,15 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void processInput(GLFWwindow *window) {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+        if (!oneIsPressed) {
+            testNormals = !testNormals;
+            oneIsPressed = true;
+        }
+    } else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE) {
+        oneIsPressed = false;
+    }
 
     const float cameraSpeed = 2.0f * deltaTime; // adjust accordingly
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
