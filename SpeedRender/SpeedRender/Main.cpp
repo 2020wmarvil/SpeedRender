@@ -1,4 +1,7 @@
-﻿#define GLFW_INCLUDE_NONE
+﻿// TODO: model->GetModelMatrix(); and scale each model appropriately
+// TODO: wireframe shader
+
+#define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -87,6 +90,10 @@ int main() {
 
     // mesh data
     Model cube("assets/models/cube.obj");
+    Model sphere("assets/models/sphere.obj");
+    //Model bunny("assets/models/bunny.obj");
+    //Model teapot("assets/models/teapot.obj");
+    //Model suzanne("assets/models/suzanne.obj");
 
     // textures
     Texture::SetFlipImageOnLoad(true);
@@ -94,21 +101,28 @@ int main() {
     Texture specularMap("assets/images/container2_specular.png");
 
     // set up shaders
+    Shader unlitShader("assets/shaders/MainVertex.vs", "assets/shaders/Unlit.fs");
+    Shader litShader("assets/shaders/MainVertex.vs", "assets/shaders/Lit.fs");
+    Shader wireframeShader("assets/shaders/MainVertex.vs", "assets/shaders/Wireframe.fs");
     Shader normalsShader("assets/shaders/MainVertex.vs", "assets/shaders/TestNormals.fs");
     Shader uvsShader("assets/shaders/MainVertex.vs", "assets/shaders/TestUVs.fs");
     Material material = { diffuseMap, specularMap, 32.0f };
 
     // lights
-    DirectionalLight dirLight(glm::vec3(-0.2f, -1.0f, -0.3f), Color(1.0f, 0.0f, 0.0f),
+    DirectionalLight dirLight(glm::vec3(-0.2f, -1.0f, -0.3f), Color(1.0f, 1.0f, 1.0f),
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
             glm::vec3(0.5f, 0.5f, 0.5f),
             glm::vec3(1.0f, 1.0f, 1.0f)
         });
 
-    
-    enum RenderState { RS_WIREFRAME, RS_UNLIT, RS_LIT, RS_NORMALS, RS_UVS, RS_COUNT };
-    int renderState = RS_NORMALS;
+    enum ShaderState { SS_UNLIT, SS_LIT, SS_WIREFRAME, SS_NORMALS, SS_UVS, SS_COUNT };
+    int shaderState = SS_LIT;
+    Shader* shader = &litShader;
+
+    enum ModelState { MS_CUBE, MS_SPHERE, MS_BUNNY, MS_TEAPOT, MS_SUZANNE, MS_COUNT };
+    int modelState = MS_CUBE;
+    Model* model = &cube;
 
     // render loop
     while(!glfwWindowShouldClose(window)) {
@@ -131,9 +145,22 @@ int main() {
             ImGui::Begin("Settings");
             ImGui::Text("This is some useful text.");
 
-            const char* state_names[RS_COUNT] = { "Unlit", "Lit", "Wireframe", "Normals", "UVs" };
-            const char* state_name = (renderState >= 0 && renderState < RS_COUNT) ? state_names[renderState] : "Unknown";
-            ImGui::SliderInt("RenderType", &renderState, 0, RS_COUNT - 1, state_name);
+            const char* shader_names[SS_COUNT] = { "Unlit", "Lit", "Wireframe", "Normals", "UVs" };
+            ImGui::SliderInt("Shader", &shaderState, 0, SS_COUNT - 1, shader_names[shaderState]);
+            const char* model_names[MS_COUNT] = { "Cube", "Sphere", "Bunny", "Teapot", "Suzanne" };
+            ImGui::SliderInt("Model", &modelState, 0, MS_COUNT - 1, model_names[modelState]);
+
+            if (shaderState == SS_UNLIT) shader = &unlitShader;
+            else if (shaderState == SS_LIT) shader = &litShader;
+            else if (shaderState == SS_WIREFRAME) shader = &wireframeShader;
+            else if (shaderState == SS_NORMALS) shader = &normalsShader;
+            else if (shaderState == SS_UVS) shader = &uvsShader;
+
+            if (modelState == MS_CUBE) model = &cube;
+            else if (modelState == MS_SPHERE) model = &sphere;
+            //else if (modelState == MS_BUNNY) model = &bunny;
+            //else if (modelState == MS_TEAPOT) model = &teapot;
+            //else if (modelState == MS_SUZANNE) model = &suzanne;
 
             if (ImGui::Button("Fracture")) { }
             ImGui::SameLine();
@@ -146,58 +173,38 @@ int main() {
             ImGui::PopStyleColor();
         }
 
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 projection = camera.GetProjectionMatrix();
-
-        /* Lit Shader 
-        shader.SetMat4("model", model);
-        shader.SetMat4("view", view);
-        shader.SetMat4("projection", projection);
-        shader.SetVec3("cameraPos", camera.position);
-        shader.SetVec3("dirLight.direction", dirLight.direction);
-        shader.SetVec3("dirLight.color", dirLight.color);
-        shader.SetVec3("dirLight.ambient", dirLight.lightProfile.ambient);
-        shader.SetVec3("dirLight.diffuse", dirLight.lightProfile.diffuse);
-        shader.SetVec3("dirLight.specular", dirLight.lightProfile.specular);
-        shader.SetInt("material.diffuse", 0);
-        shader.SetInt("material.specular", 1);
-        shader.SetFloat("material.shininess", material.shininess); */
-
-        /* Unlit Shader
-        shader.SetMat4("model", model);
-        shader.SetMat4("view", view);
-        shader.SetMat4("projection", projection);
-        shader.SetVec3("mainColor", glm::vec3(1.0f, 1.0f, 1.0f)); */
+        glm::mat4 m = glm::mat4(1.0f);
+        glm::mat4 v = camera.GetViewMatrix();
+        glm::mat4 p = camera.GetProjectionMatrix();
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, material.diffuseMap.id);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, material.specularMap.id);
 
-        switch (renderState) {
-        case RS_UNLIT: {
-            break;
-        } case RS_LIT: {
-            break;
-        } case RS_WIREFRAME: {
-            break;
-        } case RS_NORMALS: {
-            normalsShader.Use();
-            normalsShader.SetMat4("model", model);
-            normalsShader.SetMat4("view", view);
-            normalsShader.SetMat4("projection", projection);
-            cube.Draw(normalsShader);
-            break;
-        } case RS_UVS: {
-            uvsShader.Use();
-            uvsShader.SetMat4("model", model);
-            uvsShader.SetMat4("view", view);
-            uvsShader.SetMat4("projection", projection);
-            cube.Draw(uvsShader);
-            break;
+        shader->Use();
+        shader->SetMat4("model", m);
+        shader->SetMat4("view", v);
+        shader->SetMat4("projection", p);
+
+        if (shaderState == SS_UNLIT) {
+            shader->SetInt("mainTex", 0);
+            shader->SetVec3("mainColor", glm::vec3(1.0f, 1.0f, 1.0f)); 
+        } else if (shaderState == SS_LIT) {
+            shader->SetVec3("cameraPos", camera.position);
+            shader->SetVec3("dirLight.direction", dirLight.direction);
+            shader->SetVec3("dirLight.color", dirLight.color);
+            shader->SetVec3("dirLight.ambient", dirLight.lightProfile.ambient);
+            shader->SetVec3("dirLight.diffuse", dirLight.lightProfile.diffuse);
+            shader->SetVec3("dirLight.specular", dirLight.lightProfile.specular);
+            shader->SetInt("material.diffuse", 0);
+            shader->SetInt("material.specular", 1);
+            shader->SetFloat("material.shininess", material.shininess);
+        } else if (shaderState == SS_WIREFRAME) {
+            shader->SetVec3("wireColor", glm::vec3(0.25f, 0.5f, 0.7f)); 
         }
-        }
+
+        model->Draw(*shader);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

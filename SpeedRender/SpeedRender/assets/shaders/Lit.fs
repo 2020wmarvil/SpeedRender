@@ -73,13 +73,13 @@ void main() {
     
     color += CalcDirLight(dirLight, norm, viewDir);
 
-    for(int i = 0; i < NR_POINT_LIGHTS; i++) {
-    	color += CalcPointLight(pointLights[i], norm, worldPos, viewDir);
-    }
+    //for(int i = 0; i < NR_POINT_LIGHTS; i++) {
+    //	color += CalcPointLight(pointLights[i], norm, worldPos, viewDir);
+    //}
 
-    for(int i = 0; i < NR_SPOT_LIGHTS; i++) {
-    	color += CalcSpotLight(spotLights[i], norm, worldPos, viewDir);
-    }
+    //for(int i = 0; i < NR_SPOT_LIGHTS; i++) {
+    //	color += CalcSpotLight(spotLights[i], norm, worldPos, viewDir);
+    //}
     
     FragColor = vec4(color, 1.0);
 }
