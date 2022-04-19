@@ -194,6 +194,7 @@
     <ClInclude Include="vendor\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\shaders\EM_Lit.fs" />
     <None Include="assets\shaders\Flat.fs" />
     <None Include="assets\shaders\LOGL_PBR.fs" />
     <None Include="assets\shaders\Skybox.fs" />

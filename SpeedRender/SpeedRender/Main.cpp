@@ -1,5 +1,11 @@
-﻿// TODO: wireframe shader
+﻿// TODO: find cool skyboxes
+// TODO: wireframe shader
 // TODO: use textures in the mesh
+// TODO: better lighting
+
+// TODO: geometry processing
+// TODO: physics
+// TODO: profiling
 
 #define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
@@ -134,6 +140,7 @@ int main() {
     // set up shaders
     Shader unlitShader("assets/shaders/MainVertex.vs", "assets/shaders/Unlit.fs");
     Shader litShader("assets/shaders/MainVertex.vs", "assets/shaders/LOGL_PBR.fs");
+    Shader emShader("assets/shaders/MainVertex.vs", "assets/shaders/EM_Lit.fs");
     Shader wireframeShader("assets/shaders/MainVertex.vs", "assets/shaders/Wireframe.fs");
     Shader normalsShader("assets/shaders/MainVertex.vs", "assets/shaders/TestNormals.fs");
     Shader uvsShader("assets/shaders/MainVertex.vs", "assets/shaders/TestUVs.fs");
@@ -147,20 +154,23 @@ int main() {
             glm::vec3(1.0f, 1.0f, 1.0f)
         });
 
-    enum ShaderState { SS_UNLIT, SS_LIT, SS_WIREFRAME, SS_NORMALS, SS_UVS, SS_COUNT };
+    enum ShaderState { SS_UNLIT, SS_LIT, SS_EM_LIT, SS_WIREFRAME, SS_NORMALS, SS_UVS, SS_COUNT };
     int shaderState = SS_LIT;
     Shader* shader = &litShader;
 
     enum ModelState { MS_CUBE, MS_SPHERE, MS_BUNNY, MS_TEAPOT, MS_SUZANNE, MS_COUNT };
-    int modelState = MS_CUBE;
-    Model* model = &cube;
+    int modelState = MS_BUNNY;
+    Model* model = &bunny;
 
     float flatness = 1.0f;
 
     glm::vec3 albedo(1.0f, 0.0f, 0.0f);
-    float metallic = 1.0f;
-    float roughness = 0.223f;
-    float ao = 0.312f;
+    float metallic = 0.0f;
+    float roughness = 1.0f;
+    float ao = 0.295f;
+
+    float refractionIndex = 1.3f;
+    float reflectance = 0.5f;
 
     // skybox
     stbi_set_flip_vertically_on_load(false);
@@ -195,7 +205,7 @@ int main() {
             ImGui::Text("Hold RMB to explore");
 
             const char* model_names[MS_COUNT] = { "Cube", "Sphere", "Bunny", "Teapot", "Suzanne" };
-            const char* shader_names[SS_COUNT] = { "Unlit", "Lit", "Wireframe", "Normals", "UVs" };
+            const char* shader_names[SS_COUNT] = { "Unlit", "Lit", "Env Mapping", "Wireframe", "Normals", "UVs" };
             ImGui::Combo("Model", &modelState, model_names, IM_ARRAYSIZE(model_names));
             ImGui::Combo("Shader", &shaderState, shader_names, IM_ARRAYSIZE(shader_names));
 
@@ -204,8 +214,12 @@ int main() {
             ImGui::SliderFloat("Roughness", &roughness, 0.0f, 1.0f);
             ImGui::SliderFloat("AO", &ao, 0.0f, 1.0f);
 
+            ImGui::SliderFloat("Refraction", &refractionIndex, 0.0f, 2.0f);
+            ImGui::SliderFloat("Reflectance", &reflectance, 0.0f, 1.0f);
+
             if (shaderState == SS_UNLIT) shader = &unlitShader;
             else if (shaderState == SS_LIT) shader = &litShader;
+            else if (shaderState == SS_EM_LIT) shader = &emShader;
             else if (shaderState == SS_WIREFRAME) shader = &wireframeShader;
             else if (shaderState == SS_NORMALS) shader = &normalsShader;
             else if (shaderState == SS_UVS) shader = &uvsShader;
@@ -230,8 +244,6 @@ int main() {
         glm::mat4 m = model->GetModelMatrix();
         glm::mat4 v = camera.GetViewMatrix();
         glm::mat4 p = camera.GetProjectionMatrix();
-
-        skybox.Draw(v, p);
 
         glDepthMask(GL_TRUE);
         shader->Use();
@@ -265,12 +277,18 @@ int main() {
             shader->SetVec3("lightColors[3]", glm::vec3(1.0f, 1.0f, 1.0f));
 
             shader->SetVec3("cameraPos", camera.position);
+        } else if (shaderState == SS_EM_LIT) {
+            shader->SetVec3("cameraPos", camera.position);
+            shader->SetFloat("refractionIndex", refractionIndex);
+            shader->SetFloat("reflectance", reflectance);
         } else if (shaderState == SS_WIREFRAME) {
             shader->SetVec3("wireColor", glm::vec3(0.25f, 0.5f, 0.7f)); 
             shader->SetFloat("bFlat", flatness);
         }
 
         model->Draw(*shader);
+
+        skybox.Draw(v, p);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

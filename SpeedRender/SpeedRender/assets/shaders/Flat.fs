@@ -6,7 +6,6 @@ in vec3 worldPos;
 in vec3 normal;
 
 uniform vec3 wireColor;
-
 uniform float bFlat;
 
 const vec3 lightPos 	= vec3(200,60,100);
