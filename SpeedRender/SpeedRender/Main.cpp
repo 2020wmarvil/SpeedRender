@@ -128,7 +128,7 @@ int main() {
 
     // set up shaders
     Shader unlitShader("assets/shaders/MainVertex.vs", "assets/shaders/Unlit.fs");
-    Shader litShader("assets/shaders/MainVertex.vs", "assets/shaders/Lit.fs");
+    Shader litShader("assets/shaders/MainVertex.vs", "assets/shaders/LOGL_PBR.fs");
     Shader wireframeShader("assets/shaders/MainVertex.vs", "assets/shaders/Wireframe.fs");
     Shader normalsShader("assets/shaders/MainVertex.vs", "assets/shaders/TestNormals.fs");
     Shader uvsShader("assets/shaders/MainVertex.vs", "assets/shaders/TestUVs.fs");
@@ -151,6 +151,10 @@ int main() {
     Model* model = &cube;
 
     float flatness = 0.0f;
+    glm::vec3 albedo(1.0f, 0.0f, 0.0f);
+    float metallic = 0.5f;
+    float roughness = 0.5f;
+    float ao = 0.5f;
 
     // render loop
     while(!glfwWindowShouldClose(window)) {
@@ -179,6 +183,11 @@ int main() {
             ImGui::Combo("Shader", &shaderState, shader_names, IM_ARRAYSIZE(shader_names));
 
             ImGui::SliderFloat("Flat", &flatness, 0.0f, 1.0f);
+
+            ImGui::ColorEdit3("Albedo", (float*)&albedo);
+            ImGui::SliderFloat("Metallic", &metallic, 0.0f, 1.0f);
+            ImGui::SliderFloat("Roughness", &roughness, 0.0f, 1.0f);
+            ImGui::SliderFloat("AO", &ao, 0.0f, 1.0f);
 
             if (shaderState == SS_UNLIT) shader = &unlitShader;
             else if (shaderState == SS_LIT) shader = &litShader;
@@ -221,15 +230,31 @@ int main() {
             shader->SetInt("diffuse1", 0);
             shader->SetVec3("mainColor", glm::vec3(1.0f, 1.0f, 1.0f)); 
         } else if (shaderState == SS_LIT) {
+            //shader->SetVec3("dirLight.direction", dirLight.direction);
+            //shader->SetVec3("dirLight.color", dirLight.color);
+            //shader->SetVec3("dirLight.ambient", dirLight.lightProfile.ambient);
+            //shader->SetVec3("dirLight.diffuse", dirLight.lightProfile.diffuse);
+            //shader->SetVec3("dirLight.specular", dirLight.lightProfile.specular);
+            //shader->SetInt("material.diffuse1", 0);
+            //shader->SetInt("material.specular1", 1);
+            //shader->SetFloat("material.shininess", material.shininess);
+            
+            // material
+            shader->SetVec3("albedo", albedo);
+            shader->SetFloat("metallic", metallic);
+            shader->SetFloat("roughness", roughness);
+            shader->SetFloat("ao", ao);
+            // lights
+            shader->SetVec3("lightPositions[0]", glm::vec3(1.0f, 5.0f, 0.0f));
+            shader->SetVec3("lightPositions[1]", glm::vec3(-1.0f, -5.0f, 0.0f));
+            shader->SetVec3("lightPositions[2]", glm::vec3(0.0f, 0.0f, 1.0f));
+            shader->SetVec3("lightPositions[3]", glm::vec3(3.0f, 0.0f, -1.0f));
+            shader->SetVec3("lightColors[0]", glm::vec3(1.0f, 1.0f, 1.0f));
+            shader->SetVec3("lightColors[1]", glm::vec3(1.0f, 1.0f, 1.0f));
+            shader->SetVec3("lightColors[2]", glm::vec3(1.0f, 1.0f, 1.0f));
+            shader->SetVec3("lightColors[3]", glm::vec3(1.0f, 1.0f, 1.0f));
+
             shader->SetVec3("cameraPos", camera.position);
-            shader->SetVec3("dirLight.direction", dirLight.direction);
-            shader->SetVec3("dirLight.color", dirLight.color);
-            shader->SetVec3("dirLight.ambient", dirLight.lightProfile.ambient);
-            shader->SetVec3("dirLight.diffuse", dirLight.lightProfile.diffuse);
-            shader->SetVec3("dirLight.specular", dirLight.lightProfile.specular);
-            shader->SetInt("material.diffuse1", 0);
-            shader->SetInt("material.specular1", 1);
-            shader->SetFloat("material.shininess", material.shininess);
         } else if (shaderState == SS_WIREFRAME) {
             shader->SetVec3("wireColor", glm::vec3(0.25f, 0.5f, 0.7f)); 
             shader->SetFloat("bFlat", flatness);

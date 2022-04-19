@@ -190,6 +190,8 @@
     <ClInclude Include="vendor\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\shaders\Flat.fs" />
+    <None Include="assets\shaders\LOGL_PBR.fs" />
     <None Include="assets\shaders\TestNormals.fs" />
     <None Include="assets\shaders\TestUVs.fs" />
     <None Include="assets\shaders\MainVertex.vs" />
