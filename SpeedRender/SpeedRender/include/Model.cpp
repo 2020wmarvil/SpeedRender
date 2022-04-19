@@ -21,8 +21,8 @@ void Model::LoadModel(std::string path) {
 
         for (int j = 0; j < 3; j++) {
             cy::Vec3f pos = t.V(f.v[j]); // position
-            cy::Vec3f norm;
-            cy::Vec3f uv;
+            cy::Vec3f norm(0.0f);
+            cy::Vec3f uv(0.0f);
 
             if (t.HasNormals()) norm = t.VN(fn.v[j]);       // normal
             if (t.HasTextureVertices()) uv = t.VT(ft.v[j]); // uv
@@ -39,8 +39,8 @@ void Model::LoadModel(std::string path) {
         }
     }
 
-    std::vector<Texture> textures;
-    Mesh mesh(vertices, indices, textures);
+	std::vector<Texture> textures;
+	Mesh mesh(vertices, indices, textures, t.HasNormals(), t.HasTextureVertices());
     meshes.push_back(mesh);
 
 }

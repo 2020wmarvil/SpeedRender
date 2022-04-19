@@ -17,8 +17,10 @@ class Mesh {
         std::vector<Vertex>       vertices;
         std::vector<unsigned int> indices;
         std::vector<Texture>      textures;
+        bool hasNormals;
+        bool hasUVs;
 
-        Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+        Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, bool hasNormals, bool hasUVs);
         void Draw(Shader &shader);
     private:
         //  render data

@@ -2,6 +2,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -47,6 +51,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 float lastTime = 0.0f, deltaTime = 0.0f;
 bool testNormals = false, oneIsPressed = false;
+bool mainWindowFocused = true;
 
 Camera camera(
     glm::vec3(0.0f, 0.0f,  3.0f),
@@ -63,22 +68,20 @@ int main() {
 
     // window creation
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Speed Render", NULL, NULL);
-    if (window == NULL) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
     glfwMakeContextCurrent(window);
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }   
-
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);  
     glfwSetCursorPosCallback(window, mouse_callback);  
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
     glfwSetScrollCallback(window, scroll_callback); 
+
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+    // setup imgui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
 
     glViewport(0, 0, WIDTH, HEIGHT);
     glEnable(GL_DEPTH_TEST);
@@ -106,6 +109,10 @@ int main() {
 
     // render loop
     while(!glfwWindowShouldClose(window)) {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
         deltaTime = glfwGetTime() - lastTime;
         lastTime = glfwGetTime();
 
@@ -113,6 +120,30 @@ int main() {
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+        {
+            static float f = 0.0f;
+            static int counter = 0;
+
+            ImGui::Begin("Settings");                          // Create a window called "Hello, world!" and append into it.
+
+            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+            //ImGui::Checkbox("Another Window", &show_another_window);
+
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+            if (ImGui::Button("Fracture")) {
+                //Fracture();
+            }
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
+
+            ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
+            ImGui::End();
+        }
 
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
@@ -157,12 +188,21 @@ int main() {
             cube.Draw(uvsShader);
         }
 
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
         glfwSwapBuffers(window);
         glfwPollEvents();
 
         glCheckError();
     }
 
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window);
     glfwTerminate();
 
     return 0;
@@ -181,7 +221,16 @@ void ProcessInput(GLFWwindow *window) {
         oneIsPressed = false;
     }
 
-    camera.ProcessWindowEvents(window, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        mainWindowFocused = true;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
+    } else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE) {
+        mainWindowFocused = false;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);  
+    }
+
+    if (mainWindowFocused) camera.ProcessWindowEvents(window, deltaTime);
+
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -189,9 +238,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }  
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    camera.UpdateMousePosition(xpos, ypos);
+    if (mainWindowFocused) camera.UpdateMousePosition(xpos, ypos);
 }  
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-    camera.UpdateScrollPosition(xoffset, yoffset);
+    if (mainWindowFocused) camera.UpdateScrollPosition(xoffset, yoffset);
 }

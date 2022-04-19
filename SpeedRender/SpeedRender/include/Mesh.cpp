@@ -1,9 +1,11 @@
 #include "Mesh.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, bool hasNormals, bool hasUVs) {
     this->vertices = vertices;
     this->indices = indices;
     this->textures = textures;
+    this->hasNormals = hasNormals;
+    this->hasUVs = hasUVs;
 
     SetupMesh();
 }
@@ -16,21 +18,33 @@ void Mesh::SetupMesh() {
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);  
+    int vertexSize = sizeof(Vertex);
+    if (!hasNormals) vertexSize -= 3 * sizeof(float);
+    if (!hasUVs)     vertexSize -= 2 * sizeof(float);
+
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * vertexSize, &vertices[0], GL_STATIC_DRAW);  
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
-    // vertex positions
-    glEnableVertexAttribArray(0);	
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-    // vertex normals
-    glEnableVertexAttribArray(1);	
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    // vertex texture coords
-    glEnableVertexAttribArray(2);	
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+    int attribArray = 0;
+    glEnableVertexAttribArray(attribArray);
+    glVertexAttribPointer(attribArray, 3, GL_FLOAT, GL_FALSE, vertexSize, (void*)0);
+    attribArray++;
 
+    if (hasNormals) {
+        glEnableVertexAttribArray(attribArray);	
+        glVertexAttribPointer(attribArray, 3, GL_FLOAT, GL_FALSE, vertexSize, (void*)offsetof(Vertex, normal));
+        attribArray++;
+    }
+
+    if (hasUVs) {
+        glEnableVertexAttribArray(attribArray);	
+        glVertexAttribPointer(attribArray, 2, GL_FLOAT, GL_FALSE, vertexSize, (void*)offsetof(Vertex, texCoords));
+        attribArray++;
+    }
+
+        std::cout << hasNormals << " " << hasUVs << "\n";
     glBindVertexArray(0);
 }
 
