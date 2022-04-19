@@ -42,9 +42,7 @@ void Mesh::SetupMesh() {
         glEnableVertexAttribArray(attribArray);	
         glVertexAttribPointer(attribArray, 2, GL_FLOAT, GL_FALSE, vertexSize, (void*)offsetof(Vertex, texCoords));
         attribArray++;
-    }
-
-        std::cout << hasNormals << " " << hasUVs << "\n";
+    } std::cout << hasNormals << " " << hasUVs << "\n";
     glBindVertexArray(0);
 }
 

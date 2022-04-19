@@ -15,9 +15,10 @@ public:
 
 	glm::mat4 GetViewMatrix();
 	glm::mat4 GetProjectionMatrix();
+
+	glm::vec3 position, forward, up;
 private:
 	float speed = 2.0f;
-	glm::vec3 position, forward, up;
 	float pitch = 0.0f, yaw = -90.0f;
 	float fov = 45.0f;
 	float nearClip = 0.1f, farClip = 100.0f;

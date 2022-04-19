@@ -50,13 +50,12 @@ void ProcessInput(GLFWwindow* window);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 float lastTime = 0.0f, deltaTime = 0.0f;
-bool testNormals = false, oneIsPressed = false;
 bool mainWindowFocused = true;
 
 Camera camera(
-    glm::vec3(0.0f, 0.0f,  3.0f),
-    glm::vec3(0.0f, 0.0f, -1.0f),
-    glm::vec3(0.0f, 1.0f,  0.0f), WIDTH, HEIGHT
+    glm::vec3(5.0f),
+    glm::vec3(-0.5f),
+    glm::vec3(0.0f, 1.0f, 0.0f), WIDTH, HEIGHT
 );
 
 int main() {
@@ -107,6 +106,10 @@ int main() {
             glm::vec3(1.0f, 1.0f, 1.0f)
         });
 
+    
+    enum RenderState { RS_WIREFRAME, RS_UNLIT, RS_LIT, RS_NORMALS, RS_UVS, RS_COUNT };
+    int renderState = RS_NORMALS;
+
     // render loop
     while(!glfwWindowShouldClose(window)) {
         ImGui_ImplOpenGL3_NewFrame();
@@ -121,28 +124,26 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+        ImGui::ShowDemoWindow();
 
         {
-            static float f = 0.0f;
-            static int counter = 0;
+            ImGui::PushStyleColor(ImGuiCol_ResizeGrip, 0);
+            ImGui::Begin("Settings");
+            ImGui::Text("This is some useful text.");
 
-            ImGui::Begin("Settings");                          // Create a window called "Hello, world!" and append into it.
+            const char* state_names[RS_COUNT] = { "Unlit", "Lit", "Wireframe", "Normals", "UVs" };
+            const char* state_name = (renderState >= 0 && renderState < RS_COUNT) ? state_names[renderState] : "Unknown";
+            ImGui::SliderInt("RenderType", &renderState, 0, RS_COUNT - 1, state_name);
 
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            //ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-            if (ImGui::Button("Fracture")) {
-                //Fracture();
-            }
+            if (ImGui::Button("Fracture")) { }
             ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
+            if (ImGui::Button("Reset")) { }
+            ImGui::End();
 
+            ImGui::Begin("FPS", (bool*)true, ImGuiWindowFlags_NoTitleBar);
             ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
             ImGui::End();
+            ImGui::PopStyleColor();
         }
 
         glm::mat4 model = glm::mat4(1.0f);
@@ -174,23 +175,32 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, material.specularMap.id);
 
-        if (testNormals) {
+        switch (renderState) {
+        case RS_UNLIT: {
+            break;
+        } case RS_LIT: {
+            break;
+        } case RS_WIREFRAME: {
+            break;
+        } case RS_NORMALS: {
             normalsShader.Use();
             normalsShader.SetMat4("model", model);
             normalsShader.SetMat4("view", view);
             normalsShader.SetMat4("projection", projection);
             cube.Draw(normalsShader);
-        } else {
+            break;
+        } case RS_UVS: {
             uvsShader.Use();
             uvsShader.SetMat4("model", model);
             uvsShader.SetMat4("view", view);
             uvsShader.SetMat4("projection", projection);
             cube.Draw(uvsShader);
+            break;
+        }
         }
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -212,15 +222,6 @@ void ProcessInput(GLFWwindow *window) {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-        if (!oneIsPressed) {
-            testNormals = !testNormals;
-            oneIsPressed = true;
-        }
-    } else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE) {
-        oneIsPressed = false;
-    }
-
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         mainWindowFocused = true;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
@@ -230,7 +231,6 @@ void ProcessInput(GLFWwindow *window) {
     }
 
     if (mainWindowFocused) camera.ProcessWindowEvents(window, deltaTime);
-
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
