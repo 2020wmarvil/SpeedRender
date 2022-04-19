@@ -17,6 +17,7 @@ public:
 	glm::mat4 GetProjectionMatrix();
 
 	glm::vec3 position, forward, up;
+	bool firstMouse = true;
 private:
 	float speed = 2.0f;
 	float pitch = 0.0f, yaw = -90.0f;
@@ -25,7 +26,6 @@ private:
 	float width, height;
 
 	float lastX, lastY;
-	bool firstMouse = true;
 };
 
 Camera::Camera(glm::vec3 position, glm::vec3 forward, glm::vec3 up, float width, float height) {
@@ -34,15 +34,14 @@ Camera::Camera(glm::vec3 position, glm::vec3 forward, glm::vec3 up, float width,
 	this->up = up;
 	this->width = width;
 	this->height = height;
-
-	lastX = width / 2;
-	lastY = height / 2;
 }
 
 void Camera::UpdateMousePosition(double xpos, double ypos) {
     if (firstMouse) {
         lastX = xpos;
         lastY = ypos;
+        pitch = glm::degrees(asin(forward.y));
+        yaw = glm::degrees(atan2(forward.x, forward.z));
         firstMouse = false;
     }
 

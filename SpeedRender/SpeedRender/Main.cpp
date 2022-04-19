@@ -1,8 +1,5 @@
-﻿// TODO: model->GetModelMatrix(); and scale each model appropriately
-// TODO: wireframe shader
-// TODO: make movement by right click dont forget to update ui, and fix weird bug
+﻿// TODO: wireframe shader
 // TODO: use textures in the mesh
-// TODO: find new meshes
 
 #define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
@@ -50,13 +47,14 @@ GLenum glCheckError_(const char *file, int line)
 #define WIDTH 800
 #define HEIGHT 600
 
+void ProcessInput(GLFWwindow* window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);  
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void ProcessInput(GLFWwindow* window);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 float lastTime = 0.0f, deltaTime = 0.0f;
-bool mainWindowFocused = true;
+bool mainWindowFocused = false;
 
 Camera camera(
     glm::vec3(5.0f),
@@ -76,6 +74,7 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);  
     glfwSetCursorPosCallback(window, mouse_callback);  
+    glfwSetMouseButtonCallback(window, mouse_button_callback);  
     glfwSetScrollCallback(window, scroll_callback); 
 
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -256,14 +255,6 @@ void ProcessInput(GLFWwindow *window) {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        mainWindowFocused = true;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
-    } else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
-        mainWindowFocused = false;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);  
-    }
-
     if (mainWindowFocused) camera.ProcessWindowEvents(window, deltaTime);
 }
 
@@ -274,6 +265,18 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     if (mainWindowFocused) camera.UpdateMousePosition(xpos, ypos);
 }  
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        mainWindowFocused = true;
+        camera.firstMouse = true;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    } else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+        mainWindowFocused = false;
+        camera.firstMouse = false;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);  
+    }
+}
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     if (mainWindowFocused) camera.UpdateScrollPosition(xoffset, yoffset);
