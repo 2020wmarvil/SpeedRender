@@ -8,13 +8,24 @@
 #include "Mesh.h"
 
 class Model {
-    public:
-        Model(std::string path);
-        void Draw(Shader &shader);	
-    private:
-        // model data
-        std::vector<Mesh> meshes;
-        void LoadModel(std::string path);
+public:
+    Model(std::string path);
+    void Draw(Shader &shader);	
+
+    Transform transform = { glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f) };
+
+    glm::mat4 GetModelMatrix() {
+        glm::mat4 model(1.0f);
+        model = glm::translate(model, transform.position);
+        model = glm::rotate(model, transform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, transform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, transform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::scale(model, transform.scale);
+        return model;
+    }
+private:
+    std::vector<Mesh> meshes;
+    void LoadModel(std::string path);
 };
 
 #endif

@@ -1,5 +1,8 @@
 ﻿// TODO: model->GetModelMatrix(); and scale each model appropriately
 // TODO: wireframe shader
+// TODO: make movement by right click dont forget to update ui, and fix weird bug
+// TODO: use textures in the mesh
+// TODO: find new meshes
 
 #define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
@@ -90,10 +93,34 @@ int main() {
 
     // mesh data
     Model cube("assets/models/cube.obj");
-    Model sphere("assets/models/sphere.obj");
+    Model sphere("assets/models/sphere.obj"); 
     Model bunny("assets/models/bunny.obj");
     Model teapot("assets/models/teapot.obj");
     Model suzanne("assets/models/suzanne.obj");
+
+    sphere.transform = {
+        glm::vec3(0.0f, -1.703f, 0.0f),
+        glm::vec3(0.0f),
+        glm::vec3(0.025f)
+    };
+
+    bunny.transform = {
+        glm::vec3(0.566f, -0.778f, -0.106f),
+        glm::vec3(0.0f, 0.556f, 0.0f),
+        glm::vec3(1.0f)
+    };
+
+    teapot.transform = {
+        glm::vec3(0.0f, -1.0f, 0.0f),
+        glm::vec3(-1.533f, 0.067f, -2.632f),
+        glm::vec3(0.153f)
+    };
+
+    suzanne.transform = {
+        glm::vec3(0.0f),
+        glm::vec3(-0.566f, 0.556f, 0.29f),
+        glm::vec3(1.241f)
+    };
 
     // textures
     Texture::SetFlipImageOnLoad(true);
@@ -109,7 +136,7 @@ int main() {
     Material material = { diffuseMap, specularMap, 32.0f };
 
     // lights
-    DirectionalLight dirLight(glm::vec3(-0.2f, -1.0f, -0.3f), Color(1.0f, 1.0f, 1.0f),
+    DirectionalLight dirLight(glm::vec3(-0.216f, -0.6f, -0.455f), Color(1.0f, 1.0f, 1.0f),
         { 
             glm::vec3(0.2f, 0.2f, 0.2f),
             glm::vec3(0.5f, 0.5f, 0.5f),
@@ -117,12 +144,12 @@ int main() {
         });
 
     enum ShaderState { SS_UNLIT, SS_LIT, SS_WIREFRAME, SS_NORMALS, SS_UVS, SS_COUNT };
-    int shaderState = SS_WIREFRAME;
-    Shader* shader = &wireframeShader;
+    int shaderState = SS_LIT;
+    Shader* shader = &litShader;
 
     enum ModelState { MS_CUBE, MS_SPHERE, MS_BUNNY, MS_TEAPOT, MS_SUZANNE, MS_COUNT };
-    int modelState = MS_BUNNY;
-    Model* model = &bunny;
+    int modelState = MS_CUBE;
+    Model* model = &cube;
 
     // render loop
     while(!glfwWindowShouldClose(window)) {
@@ -143,12 +170,12 @@ int main() {
         {
             ImGui::PushStyleColor(ImGuiCol_ResizeGrip, 0);
             ImGui::Begin("Settings");
-            ImGui::Text("Hold space to move around");
+            ImGui::Text("Hold RMB to explore");
 
-            const char* shader_names[SS_COUNT] = { "Unlit", "Lit", "Wireframe", "Normals", "UVs" };
-            ImGui::SliderInt("Shader", &shaderState, 0, SS_COUNT - 1, shader_names[shaderState]);
             const char* model_names[MS_COUNT] = { "Cube", "Sphere", "Bunny", "Teapot", "Suzanne" };
-            ImGui::SliderInt("Model", &modelState, 0, MS_COUNT - 1, model_names[modelState]);
+            const char* shader_names[SS_COUNT] = { "Unlit", "Lit", "Wireframe", "Normals", "UVs" };
+            ImGui::Combo("Model", &modelState, model_names, IM_ARRAYSIZE(model_names));
+            ImGui::Combo("Shader", &shaderState, shader_names, IM_ARRAYSIZE(shader_names));
 
             if (shaderState == SS_UNLIT) shader = &unlitShader;
             else if (shaderState == SS_LIT) shader = &litShader;
@@ -173,7 +200,7 @@ int main() {
             ImGui::PopStyleColor();
         }
 
-        glm::mat4 m = glm::mat4(1.0f);
+        glm::mat4 m = model->GetModelMatrix();
         glm::mat4 v = camera.GetViewMatrix();
         glm::mat4 p = camera.GetProjectionMatrix();
 
@@ -188,7 +215,7 @@ int main() {
         shader->SetMat4("projection", p);
 
         if (shaderState == SS_UNLIT) {
-            shader->SetInt("mainTex", 0);
+            shader->SetInt("diffuse1", 0);
             shader->SetVec3("mainColor", glm::vec3(1.0f, 1.0f, 1.0f)); 
         } else if (shaderState == SS_LIT) {
             shader->SetVec3("cameraPos", camera.position);
@@ -197,8 +224,8 @@ int main() {
             shader->SetVec3("dirLight.ambient", dirLight.lightProfile.ambient);
             shader->SetVec3("dirLight.diffuse", dirLight.lightProfile.diffuse);
             shader->SetVec3("dirLight.specular", dirLight.lightProfile.specular);
-            shader->SetInt("material.diffuse", 0);
-            shader->SetInt("material.specular", 1);
+            shader->SetInt("material.diffuse1", 0);
+            shader->SetInt("material.specular1", 1);
             shader->SetFloat("material.shininess", material.shininess);
         } else if (shaderState == SS_WIREFRAME) {
             shader->SetVec3("wireColor", glm::vec3(0.25f, 0.5f, 0.7f)); 
