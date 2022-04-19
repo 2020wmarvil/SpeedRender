@@ -150,6 +150,8 @@ int main() {
     int modelState = MS_CUBE;
     Model* model = &cube;
 
+    float flatness = 0.0f;
+
     // render loop
     while(!glfwWindowShouldClose(window)) {
         ImGui_ImplOpenGL3_NewFrame();
@@ -175,6 +177,8 @@ int main() {
             const char* shader_names[SS_COUNT] = { "Unlit", "Lit", "Wireframe", "Normals", "UVs" };
             ImGui::Combo("Model", &modelState, model_names, IM_ARRAYSIZE(model_names));
             ImGui::Combo("Shader", &shaderState, shader_names, IM_ARRAYSIZE(shader_names));
+
+            ImGui::SliderFloat("Flat", &flatness, 0.0f, 1.0f);
 
             if (shaderState == SS_UNLIT) shader = &unlitShader;
             else if (shaderState == SS_LIT) shader = &litShader;
@@ -228,6 +232,7 @@ int main() {
             shader->SetFloat("material.shininess", material.shininess);
         } else if (shaderState == SS_WIREFRAME) {
             shader->SetVec3("wireColor", glm::vec3(0.25f, 0.5f, 0.7f)); 
+            shader->SetFloat("bFlat", flatness);
         }
 
         model->Draw(*shader);
