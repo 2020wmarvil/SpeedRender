@@ -9,7 +9,7 @@
 
 class Texture {
 public:
-	Texture(std::string filepath);
+	Texture(std::string filepath, std::string type="diffuse");
 
 	static void SetFlipImageOnLoad(bool flip) {
 		stbi_set_flip_vertically_on_load(flip);

@@ -19,8 +19,11 @@
 #include "Camera.h"
 #include "Lighting.h"
 #include "Shader.h"
-#include "Texture.h"
 #include "Model.h"
+#include "Mesh.h"
+#include "Texture.h"
+#include "Cubemap.h"
+#include "Skybox.h"
 
 GLenum glCheckError_(const char *file, int line)
 {
@@ -57,8 +60,8 @@ float lastTime = 0.0f, deltaTime = 0.0f;
 bool mainWindowFocused = false;
 
 Camera camera(
-    glm::vec3(5.0f),
-    glm::vec3(-0.5f),
+    glm::vec3(5.134f, 2.478f, 5.126f),
+    glm::vec3(-0.7f, -0.276f, -0.659f),
     glm::vec3(0.0f, 1.0f, 0.0f), WIDTH, HEIGHT
 );
 
@@ -124,7 +127,9 @@ int main() {
     // textures
     Texture::SetFlipImageOnLoad(true);
     Texture diffuseMap("assets/images/container2.png");
-    Texture specularMap("assets/images/container2_specular.png");
+    Texture specularMap("assets/images/container2_specular.png", "specular");
+    cube.meshes[0].AddTexture(diffuseMap);
+    cube.meshes[0].AddTexture(specularMap);
 
     // set up shaders
     Shader unlitShader("assets/shaders/MainVertex.vs", "assets/shaders/Unlit.fs");
@@ -150,11 +155,23 @@ int main() {
     int modelState = MS_CUBE;
     Model* model = &cube;
 
-    float flatness = 0.0f;
+    float flatness = 1.0f;
+
     glm::vec3 albedo(1.0f, 0.0f, 0.0f);
-    float metallic = 0.5f;
-    float roughness = 0.5f;
-    float ao = 0.5f;
+    float metallic = 1.0f;
+    float roughness = 0.223f;
+    float ao = 0.312f;
+
+    // skybox
+    stbi_set_flip_vertically_on_load(false);
+    std::vector<std::string> skyboxFaces = {
+        "assets/skyboxes/water/right.jpg",
+        "assets/skyboxes/water/left.jpg",
+        "assets/skyboxes/water/top.jpg",
+        "assets/skyboxes/water/bottom.jpg",
+        "assets/skyboxes/water/front.jpg",
+        "assets/skyboxes/water/back.jpg"
+    }; Skybox skybox(skyboxFaces);
 
     // render loop
     while(!glfwWindowShouldClose(window)) {
@@ -181,8 +198,6 @@ int main() {
             const char* shader_names[SS_COUNT] = { "Unlit", "Lit", "Wireframe", "Normals", "UVs" };
             ImGui::Combo("Model", &modelState, model_names, IM_ARRAYSIZE(model_names));
             ImGui::Combo("Shader", &shaderState, shader_names, IM_ARRAYSIZE(shader_names));
-
-            ImGui::SliderFloat("Flat", &flatness, 0.0f, 1.0f);
 
             ImGui::ColorEdit3("Albedo", (float*)&albedo);
             ImGui::SliderFloat("Metallic", &metallic, 0.0f, 1.0f);
@@ -216,18 +231,15 @@ int main() {
         glm::mat4 v = camera.GetViewMatrix();
         glm::mat4 p = camera.GetProjectionMatrix();
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, material.diffuseMap.id);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, material.specularMap.id);
+        skybox.Draw(v, p);
 
+        glDepthMask(GL_TRUE);
         shader->Use();
         shader->SetMat4("model", m);
         shader->SetMat4("view", v);
         shader->SetMat4("projection", p);
 
         if (shaderState == SS_UNLIT) {
-            shader->SetInt("diffuse1", 0);
             shader->SetVec3("mainColor", glm::vec3(1.0f, 1.0f, 1.0f)); 
         } else if (shaderState == SS_LIT) {
             //shader->SetVec3("dirLight.direction", dirLight.direction);
@@ -235,8 +247,6 @@ int main() {
             //shader->SetVec3("dirLight.ambient", dirLight.lightProfile.ambient);
             //shader->SetVec3("dirLight.diffuse", dirLight.lightProfile.diffuse);
             //shader->SetVec3("dirLight.specular", dirLight.lightProfile.specular);
-            //shader->SetInt("material.diffuse1", 0);
-            //shader->SetInt("material.specular1", 1);
             //shader->SetFloat("material.shininess", material.shininess);
             
             // material

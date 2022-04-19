@@ -7,6 +7,28 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
     this->hasNormals = hasNormals;
     this->hasUVs = hasUVs;
 
+    this->hasIndices = true;
+
+    SetupMesh();
+}
+
+Mesh::Mesh(std::vector<float> vertexPositions) {
+    for (int i = 0; i < vertexPositions.size(); i+=3) {
+        vertices.push_back( {
+            glm::vec3(vertexPositions[i + 0], vertexPositions[i + 1], vertexPositions[i + 2]),
+            glm::vec3(0.0f),
+            glm::vec2(0.0f),
+        });
+
+        indices.push_back(i);
+        indices.push_back(i+1);
+        indices.push_back(i+2);
+    }
+
+    hasNormals = false;
+    hasUVs = false;
+    hasIndices = true;
+
     SetupMesh();
 }
 
@@ -20,8 +42,10 @@ void Mesh::SetupMesh() {
 
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);  
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+    if (hasIndices) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+    }
 
     int attribArray = 0;
     glEnableVertexAttribArray(attribArray);
@@ -63,6 +87,10 @@ void Mesh::Draw(Shader& shader) {
 
     // draw mesh
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    if (hasIndices) {
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    } else {
+        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    }
     glBindVertexArray(0);
 }

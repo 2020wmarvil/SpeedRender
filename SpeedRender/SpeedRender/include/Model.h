@@ -10,6 +10,7 @@
 class Model {
 public:
     Model(std::string path);
+    Model(Mesh mesh);
     void Draw(Shader &shader);	
 
     Transform transform = { glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f) };
@@ -23,8 +24,9 @@ public:
         model = glm::scale(model, transform.scale);
         return model;
     }
-private:
+
     std::vector<Mesh> meshes;
+private:
     void LoadModel(std::string path);
 };
 

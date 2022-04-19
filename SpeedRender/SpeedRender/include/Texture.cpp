@@ -1,8 +1,10 @@
 #include "Texture.h"
 
-Texture::Texture(std::string filepath) {
+Texture::Texture(std::string filepath, std::string type) {
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
+
+    this->type = type;
 
     // TODO: wrap and filter parameters
     // TODO: handle file formats (rgb, rgba, etc.)

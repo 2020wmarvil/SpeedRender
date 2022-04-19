@@ -19,9 +19,15 @@ class Mesh {
         std::vector<Texture>      textures;
         bool hasNormals;
         bool hasUVs;
+        bool hasIndices;
 
         Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, bool hasNormals, bool hasUVs);
+        Mesh(std::vector<float> vertexPositions);
         void Draw(Shader &shader);
+
+        void AddTexture(Texture tex) {
+            textures.push_back(tex);
+        }
     private:
         //  render data
         unsigned int VAO, VBO, EBO;

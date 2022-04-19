@@ -4,6 +4,10 @@ Model::Model(std::string path) {
     LoadModel(path);
 }
 
+Model::Model(Mesh mesh) {
+    meshes.push_back(mesh);
+}
+
 void Model::LoadModel(std::string path) {
     cy::TriMesh t;
     t.LoadFromFileObj(path.c_str());

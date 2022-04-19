@@ -151,9 +151,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\Cubemap.cpp" />
     <ClCompile Include="include\Lighting.cpp" />
     <ClCompile Include="include\Mesh.cpp" />
     <ClCompile Include="include\Model.cpp" />
+    <ClCompile Include="include\Skybox.cpp" />
     <ClCompile Include="include\Texture.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="glad.c" />
@@ -170,10 +172,12 @@
   <ItemGroup>
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Core.h" />
+    <ClInclude Include="include\Cubemap.h" />
     <ClInclude Include="include\Lighting.h" />
     <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\Model.h" />
     <ClInclude Include="include\Shader.h" />
+    <ClInclude Include="include\Skybox.h" />
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="vendor\cy\cyCore.h" />
     <ClInclude Include="vendor\cy\cyTriMesh.h" />
@@ -192,6 +196,8 @@
   <ItemGroup>
     <None Include="assets\shaders\Flat.fs" />
     <None Include="assets\shaders\LOGL_PBR.fs" />
+    <None Include="assets\shaders\Skybox.fs" />
+    <None Include="assets\shaders\Skybox.vs" />
     <None Include="assets\shaders\TestNormals.fs" />
     <None Include="assets\shaders\TestUVs.fs" />
     <None Include="assets\shaders\MainVertex.vs" />
