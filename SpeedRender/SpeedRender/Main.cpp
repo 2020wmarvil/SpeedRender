@@ -91,9 +91,9 @@ int main() {
     // mesh data
     Model cube("assets/models/cube.obj");
     Model sphere("assets/models/sphere.obj");
-    //Model bunny("assets/models/bunny.obj");
-    //Model teapot("assets/models/teapot.obj");
-    //Model suzanne("assets/models/suzanne.obj");
+    Model bunny("assets/models/bunny.obj");
+    Model teapot("assets/models/teapot.obj");
+    Model suzanne("assets/models/suzanne.obj");
 
     // textures
     Texture::SetFlipImageOnLoad(true);
@@ -117,12 +117,12 @@ int main() {
         });
 
     enum ShaderState { SS_UNLIT, SS_LIT, SS_WIREFRAME, SS_NORMALS, SS_UVS, SS_COUNT };
-    int shaderState = SS_LIT;
-    Shader* shader = &litShader;
+    int shaderState = SS_WIREFRAME;
+    Shader* shader = &wireframeShader;
 
     enum ModelState { MS_CUBE, MS_SPHERE, MS_BUNNY, MS_TEAPOT, MS_SUZANNE, MS_COUNT };
-    int modelState = MS_CUBE;
-    Model* model = &cube;
+    int modelState = MS_BUNNY;
+    Model* model = &bunny;
 
     // render loop
     while(!glfwWindowShouldClose(window)) {
@@ -143,7 +143,7 @@ int main() {
         {
             ImGui::PushStyleColor(ImGuiCol_ResizeGrip, 0);
             ImGui::Begin("Settings");
-            ImGui::Text("This is some useful text.");
+            ImGui::Text("Hold space to move around");
 
             const char* shader_names[SS_COUNT] = { "Unlit", "Lit", "Wireframe", "Normals", "UVs" };
             ImGui::SliderInt("Shader", &shaderState, 0, SS_COUNT - 1, shader_names[shaderState]);
@@ -158,9 +158,9 @@ int main() {
 
             if (modelState == MS_CUBE) model = &cube;
             else if (modelState == MS_SPHERE) model = &sphere;
-            //else if (modelState == MS_BUNNY) model = &bunny;
-            //else if (modelState == MS_TEAPOT) model = &teapot;
-            //else if (modelState == MS_SUZANNE) model = &suzanne;
+            else if (modelState == MS_BUNNY) model = &bunny;
+            else if (modelState == MS_TEAPOT) model = &teapot;
+            else if (modelState == MS_SUZANNE) model = &suzanne;
 
             if (ImGui::Button("Fracture")) { }
             ImGui::SameLine();
@@ -229,10 +229,10 @@ void ProcessInput(GLFWwindow *window) {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         mainWindowFocused = true;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
-    } else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE) {
+    } else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
         mainWindowFocused = false;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);  
     }

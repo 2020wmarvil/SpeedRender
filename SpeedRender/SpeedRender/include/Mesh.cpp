@@ -18,31 +18,28 @@ void Mesh::SetupMesh() {
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-    int vertexSize = sizeof(Vertex);
-    if (!hasNormals) vertexSize -= 3 * sizeof(float);
-    if (!hasUVs)     vertexSize -= 2 * sizeof(float);
-
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * vertexSize, &vertices[0], GL_STATIC_DRAW);  
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);  
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
     int attribArray = 0;
     glEnableVertexAttribArray(attribArray);
-    glVertexAttribPointer(attribArray, 3, GL_FLOAT, GL_FALSE, vertexSize, (void*)0);
+    glVertexAttribPointer(attribArray, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     attribArray++;
 
     if (hasNormals) {
         glEnableVertexAttribArray(attribArray);	
-        glVertexAttribPointer(attribArray, 3, GL_FLOAT, GL_FALSE, vertexSize, (void*)offsetof(Vertex, normal));
+        glVertexAttribPointer(attribArray, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
         attribArray++;
     }
 
     if (hasUVs) {
         glEnableVertexAttribArray(attribArray);	
-        glVertexAttribPointer(attribArray, 2, GL_FLOAT, GL_FALSE, vertexSize, (void*)offsetof(Vertex, texCoords));
+        glVertexAttribPointer(attribArray, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
         attribArray++;
-    } std::cout << hasNormals << " " << hasUVs << "\n";
+    } 
+
     glBindVertexArray(0);
 }
 
