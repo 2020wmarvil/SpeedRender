@@ -66,6 +66,8 @@ Skybox::Skybox(const std::vector<std::string>& faces) {
 void Skybox::Draw(glm::mat4 v, glm::mat4 p) {
     v = glm::mat4(glm::mat3(v));  
 
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE); 
     glDepthFunc(GL_LEQUAL);
 
     glActiveTexture(GL_TEXTURE0);
@@ -80,6 +82,4 @@ void Skybox::Draw(glm::mat4 v, glm::mat4 p) {
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
-
-    glDepthFunc(GL_LESS);
 }
