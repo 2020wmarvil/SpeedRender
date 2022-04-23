@@ -245,7 +245,6 @@ int main() {
         glm::mat4 v = camera.GetViewMatrix();
         glm::mat4 p = camera.GetProjectionMatrix();
 
-        glDepthMask(GL_TRUE);
         shader->Use();
         shader->SetMat4("model", m);
         shader->SetMat4("view", v);
