@@ -1,13 +1,4 @@
-﻿// TODO: find cool skyboxes
-// TODO: wireframe shader
-// TODO: use textures in the mesh
-// TODO: better lighting
-
-// TODO: geometry processing
-// TODO: physics
-// TODO: profiling
-
-#define GLFW_INCLUDE_NONE
+﻿#define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -138,12 +129,12 @@ int main() {
     cube.meshes[0].AddTexture(specularMap);
 
     // set up shaders
-    Shader unlitShader("assets/shaders/MainVertex.vs", "assets/shaders/Unlit.fs");
-    Shader litShader("assets/shaders/MainVertex.vs", "assets/shaders/LOGL_PBR.fs");
-    Shader emShader("assets/shaders/MainVertex.vs", "assets/shaders/EM_Lit.fs");
-    Shader wireframeShader("assets/shaders/MainVertex.vs", "assets/shaders/Wireframe.fs");
-    Shader normalsShader("assets/shaders/MainVertex.vs", "assets/shaders/TestNormals.fs");
-    Shader uvsShader("assets/shaders/MainVertex.vs", "assets/shaders/TestUVs.fs");
+    Shader unlitShader("assets/shaders/MainVertex.vert", "assets/shaders/Unlit.frag");
+    Shader litShader("assets/shaders/MainVertex.vert", "assets/shaders/LOGL_PBR.frag");
+    Shader emShader("assets/shaders/MainVertex.vert", "assets/shaders/EM_Lit.frag");
+    Shader wireframeShader("assets/shaders/MainVertex.vert", "assets/shaders/Wireframe.frag");
+    Shader normalsShader("assets/shaders/MainVertex.vert", "assets/shaders/TestNormals.frag");
+    Shader uvsShader("assets/shaders/MainVertex.vert", "assets/shaders/TestUVs.frag");
     Material material = { diffuseMap, specularMap, 32.0f };
 
     // lights

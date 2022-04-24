@@ -47,7 +47,7 @@ std::vector<float> skyboxVertices = {
 
 Skybox::Skybox(const std::vector<std::string>& faces) {
     cubemap = new Cubemap(faces);
-    shader = new Shader("assets/shaders/Skybox.vs", "assets/shaders/Skybox.fs");
+    shader = new Shader("assets/shaders/Skybox.vert", "assets/shaders/Skybox.frag");
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);

@@ -136,18 +136,18 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\shaders\MainVertex.vs" />
-    <None Include="assets\shaders\Lit.fs" />
-    <None Include="assets\shaders\TestUVs.fs" />
-    <None Include="assets\shaders\Unlit.fs" />
-    <None Include="assets\shaders\TestNormals.fs" />
-    <None Include="assets\shaders\Wireframe.fs" />
-    <None Include="assets\shaders\Flat.fs" />
-    <None Include="assets\shaders\LOGL_PBR.fs" />
-    <None Include="assets\shaders\Skybox.vs" />
-    <None Include="assets\shaders\Skybox.fs" />
-    <None Include="assets\shaders\EM_Lit.fs" />
-    <None Include="assets\shaders\TestDepthBuffer.fs" />
+    <None Include="assets\shaders\MainVertex.vert" />
+    <None Include="assets\shaders\Lit.frag" />
+    <None Include="assets\shaders\TestUVs.frag" />
+    <None Include="assets\shaders\Unlit.frag" />
+    <None Include="assets\shaders\TestNormals.frag" />
+    <None Include="assets\shaders\Wireframe.frag" />
+    <None Include="assets\shaders\Flat.frag" />
+    <None Include="assets\shaders\LOGL_PBR.frag" />
+    <None Include="assets\shaders\Skybox.vert" />
+    <None Include="assets\shaders\Skybox.frag" />
+    <None Include="assets\shaders\EM_Lit.frag" />
+    <None Include="assets\shaders\TestDepthBuffer.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\container.jpg">
